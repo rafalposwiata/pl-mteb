@@ -1,5 +1,10 @@
-from datasets import Dataset, DatasetDict
+import math
+from collections import Counter
+
 import datasets
+from datasets import Dataset, DatasetDict
+from utils import split
+from bs4 import BeautifulSoup
 
 
 def sick_r() -> None:
@@ -131,20 +136,38 @@ def allegro_reviews() -> None:
 
 def eight_tags() -> None:
     dataset = datasets.load_dataset('sdadas/8tags', ignore_verifications=True)
-
-    def split(samples, n):
-        for i in range(0, len(samples), n):
-            yield samples[i:i + n]
-
-    result = {}
+    sentences = []
+    labels = []
     for split_type in dataset:
-        result[split_type] = Dataset.from_dict({
-            "sentences": list(split(dataset[split_type]["sentence"], 500)),
-            "labels": list(split(dataset[split_type]["label"], 500))
-        })
+        sentences += dataset[split_type]["sentence"]
+        labels += dataset[split_type]["label"]
 
-    for split, dataset in DatasetDict(result).items():
-        dataset.to_json(f"8tags-clustering/{split}.jsonl")
+    dataset = Dataset.from_dict({
+        "sentences": list(split(sentences, 5000)),
+        "labels": list(split(labels, 5000))
+    })
+    dataset.to_json(f"8tags-clustering/test.jsonl")
+
+
+def hate_speech_pl() -> None:
+    dataset = datasets.load_dataset('hate_speech_pl', ignore_verifications=True)
+    dataset = dataset['train']
+
+    def clean_text(row):
+        text = BeautifulSoup(row["text"], "lxml").text
+        text = ' '.join([word.strip() for word in text.split() if word.strip() not in
+                         ['lt', 'gt', 'align', 'strong', 'justify']]).strip()
+        row["text"] = text
+        return row
+
+    forbidden_topics = [topic[0] for topic in Counter(list(dataset["topic"])).items() if topic[1] < 200]
+    dataset = dataset.filter(lambda row: row['topic'] not in forbidden_topics)
+    samples_per_set = math.ceil(dataset.num_rows / 4)
+    dataset = Dataset.from_dict({
+        "sentences": list(split(dataset.map(clean_text)["text"], samples_per_set)),
+        "labels": list(split(dataset["topic"], samples_per_set))
+    })
+    dataset.to_json(f"hate_speech_pl-clustering/test.json")
 
 
 if __name__ == '__main__':
@@ -159,3 +182,4 @@ if __name__ == '__main__':
     polemo2_out()
     allegro_reviews()
     eight_tags()
+    hate_speech_pl()
