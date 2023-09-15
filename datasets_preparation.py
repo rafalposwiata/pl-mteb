@@ -152,6 +152,7 @@ def eight_tags() -> None:
 def hate_speech_pl() -> None:
     dataset = datasets.load_dataset('hate_speech_pl', ignore_verifications=True)
     dataset = dataset['train']
+    dataset = dataset.shuffle(seed=42)
 
     def clean_text(row):
         text = BeautifulSoup(row["text"], "lxml").text
@@ -170,6 +171,32 @@ def hate_speech_pl() -> None:
     dataset.to_json(f"hate_speech_pl-clustering/test.json")
 
 
+def plsc() -> None:
+    dataset = datasets.load_dataset('rafalposwiata/plsc', ignore_verifications=True)
+    dataset = dataset['train']
+    dataset = dataset.shuffle(seed=42)
+
+    def prepare_text(row):
+        row["text"] = row['title'] if task_category == 's2s' else row['title'] + " " + row['abstract']
+        return row
+
+    for task_category in ['p2p', 's2s']:
+        dataset_with_text_column = dataset.map(prepare_text)
+        sentences = []
+        labels = []
+        for column_with_labels in ['scientific_fields', 'disciplines']:
+            filtered_dataset = dataset_with_text_column.filter(lambda row: len(row[column_with_labels]) == 1)
+            samples_per_set = math.ceil(filtered_dataset.num_rows / 10)
+            sentences += list(split(filtered_dataset["text"], samples_per_set))
+            labels += list(split(filtered_dataset[column_with_labels], samples_per_set))
+
+        _dataset = Dataset.from_dict({
+            "sentences": sentences,
+            "labels": labels
+        })
+        _dataset.to_json(f"plsc-clustering-{task_category}/test.json")
+
+
 if __name__ == '__main__':
     sick_r()
     sick_e()
@@ -183,3 +210,4 @@ if __name__ == '__main__':
     allegro_reviews()
     eight_tags()
     hate_speech_pl()
+    plsc()
