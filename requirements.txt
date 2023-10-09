@@ -1,2 +1,6 @@
 mteb
 datasets
+pandas
+tabulate
+langdetect
+tqdm

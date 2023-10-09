@@ -180,6 +180,10 @@ def plsc() -> None:
         row["text"] = row['title'] if task_category == 's2s' else row['title'] + " " + row['abstract']
         return row
 
+    def prepare_label(row):
+        row[column_with_labels] = row[column_with_labels][0]
+        return row
+
     for task_category in ['p2p', 's2s']:
         dataset_with_text_column = dataset.map(prepare_text)
         sentences = []
@@ -188,7 +192,7 @@ def plsc() -> None:
             filtered_dataset = dataset_with_text_column.filter(lambda row: len(row[column_with_labels]) == 1)
             samples_per_set = math.ceil(filtered_dataset.num_rows / 10)
             sentences += list(split(filtered_dataset["text"], samples_per_set))
-            labels += list(split(filtered_dataset[column_with_labels], samples_per_set))
+            labels += list(split(filtered_dataset.map(prepare_label)[column_with_labels], samples_per_set))
 
         _dataset = Dataset.from_dict({
             "sentences": sentences,
