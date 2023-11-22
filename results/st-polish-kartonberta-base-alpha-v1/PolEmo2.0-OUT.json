@@ -1,0 +1,13 @@
+{
+  "dataset_revision": null,
+  "mteb_dataset_name": "PolEmo2.0-OUT",
+  "mteb_version": "1.1.1",
+  "test": {
+    "accuracy": 0.38097165991902837,
+    "accuracy_stderr": 0.06123138813294995,
+    "evaluation_time": 2.54,
+    "f1": 0.3289281905448651,
+    "f1_stderr": 0.035776036123007685,
+    "main_score": 0.38097165991902837
+  }
+}

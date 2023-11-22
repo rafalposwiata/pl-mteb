@@ -1,0 +1,1 @@
+## Directory for static word embeddings and SpaCy models used for lemmatization.

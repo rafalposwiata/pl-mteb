@@ -4,3 +4,10 @@ pandas
 tabulate
 langdetect
 tqdm
+transformers
+gensim
+numpy
+torch
+nltk
+spacy==3.4.1
+spacy-download

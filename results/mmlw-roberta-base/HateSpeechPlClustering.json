@@ -1,0 +1,10 @@
+{
+  "dataset_revision": null,
+  "mteb_dataset_name": "HateSpeechPlClustering",
+  "mteb_version": "1.1.1",
+  "test": {
+    "evaluation_time": 8.56,
+    "v_measure": 0.1502770154438496,
+    "v_measure_std": 0.04668831088786275
+  }
+}

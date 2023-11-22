@@ -1,0 +1,15 @@
+{
+  "dataset_revision": null,
+  "mteb_dataset_name": "PAC",
+  "mteb_version": "1.1.1",
+  "test": {
+    "accuracy": 0.6029539530842745,
+    "accuracy_stderr": 0.06540777572251594,
+    "ap": 0.7355741367022497,
+    "ap_stderr": 0.02380900345397127,
+    "evaluation_time": 21.81,
+    "f1": 0.586507490231912,
+    "f1_stderr": 0.05448025503401791,
+    "main_score": 0.6029539530842745
+  }
+}

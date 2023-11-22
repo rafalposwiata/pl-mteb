@@ -1,0 +1,26 @@
+[
+  {
+    "model_name": "Word2Vec",
+    "model_type": "SWE",
+    "path": "resources/word2vec/word2vec_500_3_polish.bin",
+    "additional": {
+      "pooling": "concat"
+    }
+  },
+  {
+    "model_name": "GloVe",
+    "model_type": "SWE",
+    "path": "resources/glove/glove_500_3_polish.txt",
+    "additional": {
+      "pooling": "concat"
+    }
+  },
+  {
+    "model_name": "FastText",
+    "model_type": "SWE",
+    "path": "resources/fasttext/fasttext_300_3_polish.bin",
+    "additional": {
+      "pooling": "concat"
+    }
+  }
+]

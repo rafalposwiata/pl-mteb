@@ -1,0 +1,49 @@
+{
+  "dataset_revision": null,
+  "mteb_dataset_name": "PPC",
+  "mteb_version": "1.1.1",
+  "test": {
+    "cos_sim": {
+      "accuracy": 0.821,
+      "accuracy_threshold": 0.9676954256985281,
+      "ap": 0.9109417013497443,
+      "f1": 0.8478437754271766,
+      "f1_threshold": 0.9594262295063642,
+      "precision": 0.8336,
+      "recall": 0.8625827814569537
+    },
+    "dot": {
+      "accuracy": 0.759,
+      "accuracy_threshold": 288.25,
+      "ap": 0.8682680649789796,
+      "f1": 0.8053797468354431,
+      "f1_threshold": 283.25,
+      "precision": 0.7712121212121212,
+      "recall": 0.8427152317880795
+    },
+    "euclidean": {
+      "accuracy": 0.816,
+      "accuracy_threshold": 4.275936604884958,
+      "ap": 0.9081248760600693,
+      "f1": 0.8435374149659863,
+      "f1_threshold": 4.547287097625352,
+      "precision": 0.8671328671328671,
+      "recall": 0.8211920529801324
+    },
+    "evaluation_time": 1.82,
+    "manhattan": {
+      "accuracy": 0.816,
+      "accuracy_threshold": 107.74408972263336,
+      "ap": 0.9081272803548767,
+      "f1": 0.8433530906011855,
+      "f1_threshold": 117.171661734581,
+      "precision": 0.8630849220103987,
+      "recall": 0.8245033112582781
+    },
+    "max": {
+      "accuracy": 0.821,
+      "ap": 0.9109417013497443,
+      "f1": 0.8478437754271766
+    }
+  }
+}

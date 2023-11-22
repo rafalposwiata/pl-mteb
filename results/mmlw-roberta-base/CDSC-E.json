@@ -1,0 +1,49 @@
+{
+  "dataset_revision": null,
+  "mteb_dataset_name": "CDSC-E",
+  "mteb_version": "1.1.1",
+  "test": {
+    "cos_sim": {
+      "accuracy": 0.892,
+      "accuracy_threshold": 0.9697493273929509,
+      "ap": 0.7910411567659329,
+      "f1": 0.7000000000000001,
+      "f1_threshold": 0.967477406062166,
+      "precision": 0.7411764705882353,
+      "recall": 0.6631578947368421
+    },
+    "dot": {
+      "accuracy": 0.882,
+      "accuracy_threshold": 256.5,
+      "ap": 0.7257183688228148,
+      "f1": 0.6716417910447762,
+      "f1_threshold": 252.0,
+      "precision": 0.6367924528301887,
+      "recall": 0.7105263157894737
+    },
+    "euclidean": {
+      "accuracy": 0.893,
+      "accuracy_threshold": 4.068512991793824,
+      "ap": 0.7901345533432428,
+      "f1": 0.7019498607242339,
+      "f1_threshold": 4.074249682903085,
+      "precision": 0.7455621301775148,
+      "recall": 0.6631578947368421
+    },
+    "evaluation_time": 0.71,
+    "manhattan": {
+      "accuracy": 0.893,
+      "accuracy_threshold": 89.84297204017639,
+      "ap": 0.7901671381791259,
+      "f1": 0.700280112044818,
+      "f1_threshold": 89.84297204017639,
+      "precision": 0.7485029940119761,
+      "recall": 0.6578947368421053
+    },
+    "max": {
+      "accuracy": 0.893,
+      "ap": 0.7910411567659329,
+      "f1": 0.7019498607242339
+    }
+  }
+}

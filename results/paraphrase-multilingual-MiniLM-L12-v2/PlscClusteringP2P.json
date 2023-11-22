@@ -1,0 +1,10 @@
+{
+  "dataset_revision": null,
+  "mteb_dataset_name": "PlscClusteringP2P",
+  "mteb_version": "1.1.1",
+  "test": {
+    "evaluation_time": 217.94,
+    "v_measure": 0.30056993627290274,
+    "v_measure_std": 0.028895610091445388
+  }
+}

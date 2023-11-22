@@ -14,7 +14,7 @@ def sick_r() -> None:
     dataset = dataset.rename_column("sentence_B", "sentence2")
     dataset = dataset.rename_column("relatedness_score", "score")
     for split, dataset in dataset.items():
-        dataset.to_json(f"sickr-pl-sts/{split}.jsonl")
+        dataset.to_json(f"dataset/sickr-pl-sts/{split}.jsonl")
 
 
 def sick_e() -> None:
@@ -34,7 +34,7 @@ def sick_e() -> None:
         })
 
     for split, dataset in DatasetDict(result).items():
-        dataset.to_json(f"sicke-pl-pairclassification/{split}.json")
+        dataset.to_json(f"dataset/sicke-pl-pairclassification/{split}.json")
 
 
 def cdsc_r() -> None:
@@ -44,7 +44,7 @@ def cdsc_r() -> None:
     dataset = dataset.rename_column("sentence_B", "sentence2")
     dataset = dataset.rename_column("relatedness_score", "score")
     for split, dataset in dataset.items():
-        dataset.to_json(f"cdscr-sts/{split}.jsonl")
+        dataset.to_json(f"dataset/cdscr-sts/{split}.jsonl")
 
 
 def cdsc_e() -> None:
@@ -64,7 +64,7 @@ def cdsc_e() -> None:
         })
 
     for split, dataset in DatasetDict(result).items():
-        dataset.to_json(f"cdsce-pairclassification/{split}.json")
+        dataset.to_json(f"dataset/cdsce-pairclassification/{split}.json")
 
 
 def ppc() -> None:
@@ -84,7 +84,7 @@ def ppc() -> None:
         })
 
     for split, dataset in DatasetDict(result).items():
-        dataset.to_json(f"ppc-pairclassification/{split}.json")
+        dataset.to_json(f"dataset/ppc-pairclassification/{split}.json")
 
 
 def psc() -> None:
@@ -98,7 +98,7 @@ def psc() -> None:
         })
 
     for split, dataset in DatasetDict(result).items():
-        dataset.to_json(f"psc-pairclassification/{split}.json")
+        dataset.to_json(f"dataset/psc-pairclassification/{split}.json")
 
 
 def cbd() -> None:
@@ -106,7 +106,7 @@ def cbd() -> None:
     dataset = dataset.rename_column("sentence", "text")
     dataset = dataset.rename_column("target", "label")
     for split, dataset in dataset.items():
-        dataset.to_json(f"cbd/{split}.jsonl")
+        dataset.to_json(f"dataset/cbd/{split}.jsonl")
 
 
 def polemo2_in() -> None:
@@ -115,7 +115,7 @@ def polemo2_in() -> None:
     dataset = dataset.rename_column("target", "label")
     dataset = dataset.class_encode_column("label")
     for split, dataset in dataset.items():
-        dataset.to_json(f"polemo2_in/{split}.jsonl")
+        dataset.to_json(f"dataset/polemo2_in/{split}.jsonl")
 
 
 def polemo2_out() -> None:
@@ -124,14 +124,14 @@ def polemo2_out() -> None:
     dataset = dataset.rename_column("target", "label")
     dataset = dataset.class_encode_column("label")
     for split, dataset in dataset.items():
-        dataset.to_json(f"polemo2_out/{split}.jsonl")
+        dataset.to_json(f"dataset/polemo2_out/{split}.jsonl")
 
 
 def allegro_reviews() -> None:
     dataset = datasets.load_dataset('allegro/klej-allegro-reviews', ignore_verifications=True)
     dataset = dataset.rename_column("rating", "label")
     for split, dataset in dataset.items():
-        dataset.to_json(f"allegro-reviews/{split}.jsonl")
+        dataset.to_json(f"dataset/allegro-reviews/{split}.jsonl")
 
 
 def eight_tags() -> None:
@@ -146,7 +146,7 @@ def eight_tags() -> None:
         "sentences": list(split(sentences, 5000)),
         "labels": list(split(labels, 5000))
     })
-    dataset.to_json(f"8tags-clustering/test.jsonl")
+    dataset.to_json(f"dataset/8tags-clustering/test.jsonl")
 
 
 def hate_speech_pl() -> None:
@@ -168,7 +168,7 @@ def hate_speech_pl() -> None:
         "sentences": list(split(dataset.map(clean_text)["text"], samples_per_set)),
         "labels": list(split(dataset["topic"], samples_per_set))
     })
-    dataset.to_json(f"hate_speech_pl-clustering/test.json")
+    dataset.to_json(f"dataset/hate_speech_pl-clustering/test.json")
 
 
 def plsc() -> None:
@@ -198,7 +198,7 @@ def plsc() -> None:
             "sentences": sentences,
             "labels": labels
         })
-        _dataset.to_json(f"plsc-clustering-{task_category}/test.json")
+        _dataset.to_json(f"dataset/plsc-clustering-{task_category}/test.json")
 
 
 if __name__ == '__main__':
