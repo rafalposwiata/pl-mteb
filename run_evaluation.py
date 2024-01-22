@@ -2,7 +2,7 @@ import json
 from typing import List
 from mteb import MTEB
 from sentence_transformers import SentenceTransformer
-from models import ModelInfo, Model, RetrievalModel, KeyedVectorsModel
+from models import ModelInfo, ModelWrapper, RetrievalModelWrapper, KeyedVectorsModel, TransformerModel
 from transformers import HfArgumentParser
 from tasks import TaskInfo, tasks, new_tasks
 from dataclasses import dataclass, field
@@ -46,6 +46,8 @@ class PlMtebEvaluator:
             model.eval()
             if model_info.fp16:
                 model.half()
+        elif model_info.model_type == 'T':
+            model = TransformerModel(model_info)
         elif model_info.model_type == 'SWE':
             model = KeyedVectorsModel(model_info)
         else:
@@ -54,7 +56,9 @@ class PlMtebEvaluator:
 
     @staticmethod
     def _prepare_task_model(base_model, model_info: ModelInfo, task_info: TaskInfo):
-        return RetrievalModel(base_model, model_info) if task_info.task_type == 'Retrieval' else Model(base_model, model_info)
+        if task_info.task_type == 'Retrieval':
+            return RetrievalModelWrapper(base_model, model_info)
+        return ModelWrapper(base_model, model_info)
 
     @staticmethod
     def _get_task(task_info: TaskInfo):

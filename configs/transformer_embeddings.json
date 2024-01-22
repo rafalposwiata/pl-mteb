@@ -1,0 +1,12 @@
+[
+  {
+    "model_name": "sdadas/polish-roberta-base-v2",
+    "model_abbr": "Polish RoBERTa",
+    "model_type": "T"
+  },
+  {
+    "model_name": "sdadas/polish-splade",
+    "model_abbr": "Polish Splade",
+    "model_type": "T"
+  }
+]

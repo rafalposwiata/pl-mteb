@@ -5,11 +5,14 @@ from typing import List, Dict
 from mteb import DRESModel
 from gensim.models import KeyedVectors, Word2Vec
 from tqdm import tqdm
+from transformers import AutoTokenizer, AutoModel, BertModel
+
 from utils import Lemmatizer
 
 model_types = [
-    'ST',  # Sentence-Transformer
-    'SWE'  # Static Word Embedding
+    'ST',   # Sentence-Transformer
+    'T',    # Transformer
+    'SWE'   # Static Word Embedding
 ]
 
 
@@ -32,16 +35,8 @@ class ModelInfo:
     def get_abbreviation(self) -> str:
         return self.model_abbr if self.model_abbr is not None else self.get_simple_name()
 
-
-class Model:
-
-    def __init__(self, model, model_info: ModelInfo):
-        self.model = model
-        self.model_info = model_info
-
-    def encode(self, sentences, batch_size=32, **kwargs):
-        sentences = ['{}{}'.format(self.model_info.prefix, sentence) for sentence in sentences]
-        return self.model.encode(sentences, batch_size=batch_size, **kwargs)
+    def get_additional_value(self, name, default_value=None):
+        return self.additional.get(name, default_value) if self.additional is not None else default_value
 
 
 class KeyedVectorsModel:
@@ -50,7 +45,7 @@ class KeyedVectorsModel:
         self.model_info = model_info
         self.embedding: KeyedVectors = self._load_model(model_info)
         self._size: int = self.embedding.vector_size
-        self.pooling = model_info.additional['pooling']
+        self.pooling = model_info.get_additional_value('pooling')
         self.pooling_op = {'avg': self.avg_pool, 'max': self.max_pool, 'concat': self.concat_pool}[self.pooling]
         self.lemmatizer = Lemmatizer()
 
@@ -104,7 +99,45 @@ class KeyedVectorsModel:
         return vec / np.linalg.norm(vec)
 
 
-class RetrievalModel(DRESModel):
+class TransformerModel:
+
+    def __init__(self, model_info: ModelInfo):
+        self.model_info = model_info
+        torch_type = torch.float16 if model_info.fp16 else None
+        self.tokenizer = AutoTokenizer.from_pretrained(model_info.model_name, torch_dtype=torch_type)
+        self.model = AutoModel.from_pretrained(model_info.model_name)
+
+    def encode(self, sentences, batch_size=32, **kwargs):
+        embeddings = []
+        for i in tqdm(range(0, len(sentences), batch_size)):
+            batch = sentences[i:i + batch_size]
+            embeddings += self._encode(batch)
+
+        if kwargs.get('convert_to_tensor', False):
+            embeddings = torch.stack(embeddings)
+        else:
+            embeddings = np.asarray([emb.numpy() for emb in embeddings])
+        return embeddings
+
+    def _encode(self, batch):
+        max_length = self.model_info.get_additional_value('max_length', 512)
+        inputs = self.tokenizer(batch, padding=True, truncation=True, return_tensors="pt", max_length=max_length)
+        with torch.no_grad():
+            return self.model(**inputs, output_hidden_states=True, return_dict=True).pooler_output
+
+
+class ModelWrapper:
+
+    def __init__(self, model, model_info: ModelInfo):
+        self.model = model
+        self.model_info = model_info
+
+    def encode(self, sentences, batch_size=32, **kwargs):
+        sentences = ['{}{}'.format(self.model_info.prefix, sentence) for sentence in sentences]
+        return self.model.encode(sentences, batch_size=batch_size, **kwargs)
+
+
+class RetrievalModelWrapper(DRESModel):
 
     def __init__(self, model, model_info: ModelInfo, **kwargs):
         super().__init__(model, **kwargs)
