@@ -1,10 +1,7 @@
 import math
-from collections import Counter
-
 import datasets
 from datasets import Dataset, DatasetDict
 from utils import split
-from bs4 import BeautifulSoup
 
 
 def sick_r() -> None:
@@ -149,28 +146,6 @@ def eight_tags() -> None:
     dataset.to_json(f"dataset/8tags-clustering/test.jsonl")
 
 
-def hate_speech_pl() -> None:
-    dataset = datasets.load_dataset('hate_speech_pl', ignore_verifications=True)
-    dataset = dataset['train']
-    dataset = dataset.shuffle(seed=42)
-
-    def clean_text(row):
-        text = BeautifulSoup(row["text"], "lxml").text
-        text = ' '.join([word.strip() for word in text.split() if word.strip() not in
-                         ['lt', 'gt', 'align', 'strong', 'justify']]).strip()
-        row["text"] = text
-        return row
-
-    forbidden_topics = [topic[0] for topic in Counter(list(dataset["topic"])).items() if topic[1] < 200]
-    dataset = dataset.filter(lambda row: row['topic'] not in forbidden_topics)
-    samples_per_set = math.ceil(dataset.num_rows / 4)
-    dataset = Dataset.from_dict({
-        "sentences": list(split(dataset.map(clean_text)["text"], samples_per_set)),
-        "labels": list(split(dataset["topic"], samples_per_set))
-    })
-    dataset.to_json(f"dataset/hate_speech_pl-clustering/test.json")
-
-
 def plsc() -> None:
     dataset = datasets.load_dataset('rafalposwiata/plsc', ignore_verifications=True)
     dataset = dataset['train']
@@ -213,5 +188,4 @@ if __name__ == '__main__':
     polemo2_out()
     allegro_reviews()
     eight_tags()
-    hate_speech_pl()
     plsc()

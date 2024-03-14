@@ -19,7 +19,6 @@ tasks: List[TaskInfo] = [
     TaskInfo('MassiveIntentClassification', 'Classification', multilingual=True),
     TaskInfo('MassiveScenarioClassification', 'Classification', multilingual=True),
     TaskInfo('8TagsClustering', 'Clustering'),
-    TaskInfo('HateSpeechPlClustering', 'Clustering'),
     TaskInfo('PlscClusteringS2S', 'Clustering'),
     TaskInfo('PlscClusteringP2P', 'Clustering'),
     TaskInfo('SICK-E-PL', 'PairClassification'),
@@ -73,22 +72,6 @@ def tasks_of_type(task_type) -> List[str]:
 
 # ---------------------- New Tasks (not yet in MTEB) ---------------------- #
 
-class HateSpeechPlClustering(AbsTaskClustering):
-    @property
-    def description(self):
-        return {
-            "name": "HateSpeechPlClustering",
-            "hf_hub_name": "PL-MTEB/hate_speech_pl-clustering",
-            "description": "",
-            "reference": "http://hdl.handle.net/11089/33365",
-            "type": "Clustering",
-            "category": "s2s",
-            "eval_splits": ["test"],
-            "eval_langs": ["pl"],
-            "main_score": "v_measure"
-        }
-
-
 class PlscClusteringS2S(AbsTaskClustering):
     @property
     def description(self):
@@ -122,7 +105,6 @@ class PlscClusteringP2P(AbsTaskClustering):
 
 
 new_tasks = {
-    'HateSpeechPlClustering': HateSpeechPlClustering(),
     'PlscClusteringS2S': PlscClusteringS2S(),
     'PlscClusteringP2P': PlscClusteringP2P()
 }

@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from dataclasses import dataclass
-from typing import List, Dict
+from typing import List, Dict, Union
 from mteb import DRESModel
 from gensim.models import KeyedVectors, Word2Vec
 from tqdm import tqdm
@@ -143,8 +143,9 @@ class RetrievalModelWrapper(DRESModel):
         super().__init__(model, **kwargs)
         self.model_info = model_info
 
-    def encode_queries(self, queries: List[str], batch_size: int, **kwargs):
-        queries = ['{}{}'.format(self.model_info.query_prefix, q.get('text', '')) for q in queries]
+    def encode_queries(self, queries: List[Union[str, Dict]], batch_size: int, **kwargs):
+        queries = ['{}{}'.format(self.model_info.query_prefix, q if isinstance(q, str) else q.get('text', ''))
+                   for q in queries]
         return self.model.encode(queries, batch_size=batch_size, normalize_embeddings=True, **kwargs)
 
     def encode_corpus(self, corpus: List[Dict[str, str]], batch_size: int, **kwargs):

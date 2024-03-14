@@ -92,7 +92,7 @@ class ResultsSummarizer:
         for column in columns:
             if row[column] == highest_values[column][0]:
                 row[column] = wrap_with_marker(row[column], table_format)
-            if row[column] == highest_values[column][1]:
+            if len(highest_values[column]) > 1 and row[column] == highest_values[column][1]:
                 row[column] = wrap_with_marker(row[column], table_format, best_score=False)
         return row
 
