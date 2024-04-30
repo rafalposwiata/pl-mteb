@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from dataclasses import dataclass
 from typing import List, Dict, Union
-from mteb import DRESModel
+from mteb.evaluation.evaluators.RetrievalEvaluator import DRESModel
 from gensim.models import KeyedVectors, Word2Vec
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModel, BertModel
