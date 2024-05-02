@@ -1,7 +1,9 @@
 import math
+from collections import defaultdict
 import datasets
 from datasets import Dataset, DatasetDict
 from utils import split
+from sklearn.utils import shuffle
 
 
 def sick_r() -> None:
@@ -146,39 +148,47 @@ def eight_tags() -> None:
     dataset.to_json(f"8tags-clustering/test.jsonl")
 
 
-def plsc() -> None:
+def plsc(num_records_per_dataset: int = 20_000) -> None:
     dataset = datasets.load_dataset('rafalposwiata/plsc', ignore_verifications=True)
     dataset = dataset['train']
     dataset = dataset.shuffle(seed=42)
 
     def prepare_text(row):
-        row["text"] = row['title'] if task_category == 's2s' else row['title'] + " " + row['abstract']
-        return row
-
-    def prepare_label(row):
-        row[column_with_labels] = row[column_with_labels][0]
+        row['text'] = row['title'] if task_category == 's2s' else row['title'] + " " + row['abstract']
         return row
 
     for task_category in ['p2p', 's2s']:
         dataset_with_text_column = dataset.map(prepare_text)
         sentences = []
         labels = []
-        n_samples = 0
-        sum_char_length = 0
+        limit = num_records_per_dataset / 2
         for column_with_labels in ['scientific_fields', 'disciplines']:
             filtered_dataset = dataset_with_text_column.filter(lambda row: len(row[column_with_labels]) == 1)
-            n_samples += filtered_dataset.num_rows
-            sum_char_length += sum([len(text) for text in filtered_dataset["text"]])
-            samples_per_set = math.ceil(filtered_dataset.num_rows / 10)
-            sentences += list(split(filtered_dataset["text"], samples_per_set))
-            labels += list(split(filtered_dataset.map(prepare_label)[column_with_labels], samples_per_set))
+            data = defaultdict(list)
+            for row in filtered_dataset:
+                data[row[column_with_labels][0]].append(row['text'])
+
+            limit_per_class = int(limit / len(data))
+            _sentences = []
+            _labels = []
+            for label, texts in data.items():
+                _texts = texts[:limit_per_class]
+                _sentences += _texts
+                _labels += [label] * len(_texts)
+
+            _sentences, _labels = shuffle(_sentences, _labels, random_state=42)
+            sentences += _sentences
+            labels += _labels
 
         _dataset = Dataset.from_dict({
             "sentences": sentences,
             "labels": labels
         })
+        n_samples = len(sentences)
+        sum_char_length = sum([len(text) for text in sentences])
+        print(
+            f'plsc-clustering-{task_category} n_samples: {n_samples}, avg_character_length: {sum_char_length / n_samples}')
         _dataset.to_json(f"plsc-clustering-{task_category}/test.json")
-        print(f'plsc-clustering-{task_category} n_samples: {n_samples}, avg_character_length: {sum_char_length / n_samples}')
 
 
 if __name__ == '__main__':
