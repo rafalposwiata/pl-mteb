@@ -42,7 +42,7 @@ class ResultsSummarizer:
                 models += [from_dict(ModelInfo, model_info) for model_info in json.load(config_file)]
         return models
 
-    def create_main_table(self, table_format: str = 'psql') -> None:
+    def create_main_table(self, table_format: str = 'psql', sort_by: str = 'Average') -> None:
         df: pd.DataFrame = self._get_results_as_dataframe()
         df['Average'] = self._normalize(df[tasks_names].mean(axis=1))
         for task_type in tasks_types:
@@ -50,7 +50,7 @@ class ResultsSummarizer:
         df['Average (by type)'] = self._normalize(df[tasks_types].mean(axis=1))
 
         columns_with_values = tasks_types + ['Average', 'Average (by type)']
-        df = df.sort_values('Average')
+        df = df.sort_values(sort_by)
         df = df.apply(lambda row: self._mark(row, columns_with_values,
                                              self._get_highest_values(df, columns_with_values), table_format), axis=1)
         for column in columns_with_values:
@@ -60,14 +60,14 @@ class ResultsSummarizer:
         print(tabulate(df[['Model'] + columns_with_values], headers='keys',
                        tablefmt=table_format, showindex=False))
 
-    def crate_table_per_task_type(self, table_format: str = 'psql') -> None:
+    def crate_table_per_task_type(self, table_format: str = 'psql', sort_by: str = 'Average') -> None:
         df: pd.DataFrame = self._get_results_as_dataframe()
         for task_type in tasks_types:
             df['Average'] = self._normalize(df[tasks_of_type(task_type)].mean(axis=1))
-            df = df.sort_values('Average')
+            df = df.sort_values(sort_by)
 
             columns_with_values = tasks_of_type(task_type) + ['Average']
-            df = df.sort_values('Average')
+            df = df.sort_values(sort_by)
             df = df.apply(lambda row: self._mark(row, columns_with_values,
                                                  self._get_highest_values(df, columns_with_values), table_format), axis=1)
             for column in columns_with_values:
@@ -127,5 +127,5 @@ class ResultsSummarizer:
 
 if __name__ == '__main__':
     summarizer = ResultsSummarizer('results', 'configs')
-    summarizer.create_main_table()
-    summarizer.crate_table_per_task_type()
+    summarizer.create_main_table(sort_by='Idx')
+    summarizer.crate_table_per_task_type(sort_by='Idx')

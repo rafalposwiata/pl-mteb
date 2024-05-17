@@ -29,7 +29,6 @@
   },
   {
     "model_name": "intfloat/multilingual-e5-small",
-    "model_abbr": "multilingual-e5 (small)",
     "prefix": "query: ",
     "query_prefix": "query: ",
     "passage_prefix": "passage: ",
@@ -37,7 +36,6 @@
   },
   {
     "model_name": "intfloat/multilingual-e5-base",
-    "model_abbr": "multilingual-e5 (base)",
     "prefix": "query: ",
     "query_prefix": "query: ",
     "passage_prefix": "passage: ",
@@ -45,7 +43,6 @@
   },
   {
     "model_name": "intfloat/multilingual-e5-large",
-    "model_abbr": "multilingual-e5 (large)",
     "prefix": "query: ",
     "query_prefix": "query: ",
     "passage_prefix": "passage: ",
@@ -53,33 +50,28 @@
   },
   {
     "model_name": "sdadas/mmlw-e5-small",
-    "model_abbr": "mmlw-e5 (small)",
     "prefix": "query: ",
     "query_prefix": "query: ",
     "passage_prefix": "passage: "
   },
   {
     "model_name": "sdadas/mmlw-e5-base",
-    "model_abbr": "mmlw-e5 (base)",
     "prefix": "query: ",
     "query_prefix": "query: ",
     "passage_prefix": "passage: "
   },
   {
     "model_name": "sdadas/mmlw-e5-large",
-    "model_abbr": "mmlw-e5 (large)",
     "prefix": "query: ",
     "query_prefix": "query: ",
     "passage_prefix": "passage: "
   },
   {
     "model_name": "sdadas/mmlw-roberta-base",
-    "model_abbr": "mmlw-roberta (base)",
     "query_prefix": "zapytanie: "
   },
   {
     "model_name": "sdadas/mmlw-roberta-large",
-    "model_abbr": "mmlw-roberta (large)",
     "query_prefix": "zapytanie: "
   },
   {
