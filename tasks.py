@@ -67,3 +67,6 @@ def is_multilingual(task_name) -> bool:
 
 def tasks_of_type(task_type) -> List[str]:
     return [task.name for task in tasks if task.task_type == task_type]
+
+
+new_tasks = {}
