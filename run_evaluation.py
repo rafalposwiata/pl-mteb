@@ -2,7 +2,7 @@ import json
 from typing import List
 from mteb import MTEB
 from sentence_transformers import SentenceTransformer
-from models import ModelInfo, ModelWrapper, RetrievalModelWrapper, KeyedVectorsModel, TransformerModel
+from models import ModelInfo, ModelWrapper, RetrievalModelWrapper, KeyedVectorsModel, TransformerModel, FlagModel
 from transformers import HfArgumentParser
 from tasks import TaskInfo, tasks, new_tasks
 from dataclasses import dataclass, field
@@ -50,6 +50,8 @@ class PlMtebEvaluator:
             model = TransformerModel(model_info)
         elif model_info.model_type == 'SWE':
             model = KeyedVectorsModel(model_info)
+        elif model_info.model_type == 'FE':
+            model = FlagModel(model_info)
         else:
             raise Exception(f'Unknown type of model: {model_info.model_type}.')
         return model

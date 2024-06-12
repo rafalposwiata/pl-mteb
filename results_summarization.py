@@ -6,6 +6,7 @@ from os import listdir
 from models import ModelInfo
 from tasks import tasks_names, tasks_types, tasks_of_type, get_main_metric, is_multilingual
 from utils import from_dict
+import os
 
 
 def wrap_with_marker(value, table_format, best_score: bool = True) -> str:
@@ -20,13 +21,18 @@ def wrap_with_marker(value, table_format, best_score: bool = True) -> str:
 
 class ResultsSummarizer:
 
-    def __init__(self, results_dir: str, models_configs_dir: str):
+    def __init__(self, results_dir: str, models_config_path: str, only_known_models_results: bool = False):
+        self._known_models = self._load_models(models_config_path)
+        self._only_known_models_results = only_known_models_results
         self._results = self._load_results(results_dir)
-        self._models = self._load_models(models_configs_dir)
 
     def _load_results(self, results_dir: str):
         results = {}
+        model_names = self._known_model_names()
         for model_name in listdir(results_dir):
+            if self._only_known_models_results and model_name not in model_names:
+                continue
+
             results[model_name] = {}
             for task_name in listdir(os.path.join(results_dir, model_name)):
                 task_results = json.load(open(os.path.join(results_dir, model_name, task_name)))
@@ -35,11 +41,18 @@ class ResultsSummarizer:
         return results
 
     @staticmethod
-    def _load_models(models_configs_dir: str):
+    def _load_models(models_config_path: str):
         models = []
-        for models_config in listdir(models_configs_dir):
-            with open(os.path.join(models_configs_dir, models_config), "r", encoding="utf-8") as config_file:
-                models += [from_dict(ModelInfo, model_info) for model_info in json.load(config_file)]
+
+        def read_config(path):
+            with open(path, "r", encoding="utf-8") as config_file:
+                return [from_dict(ModelInfo, model_info) for model_info in json.load(config_file)]
+
+        if os.path.isdir(models_config_path):
+            for models_config in listdir(models_config_path):
+                models += read_config(os.path.join(models_config_path, models_config))
+        else:
+            models += read_config(models_config_path)
         return models
 
     def create_main_table(self, table_format: str = 'psql', sort_by: str = 'Average') -> None:
@@ -69,7 +82,8 @@ class ResultsSummarizer:
             columns_with_values = tasks_of_type(task_type) + ['Average']
             df = df.sort_values(sort_by)
             df = df.apply(lambda row: self._mark(row, columns_with_values,
-                                                 self._get_highest_values(df, columns_with_values), table_format), axis=1)
+                                                 self._get_highest_values(df, columns_with_values), table_format),
+                          axis=1)
             for column in columns_with_values:
                 df[column] = df[column].apply(self._pad)
 
@@ -78,14 +92,17 @@ class ResultsSummarizer:
                            tablefmt=table_format, showindex=False))
 
     def _get_results_as_dataframe(self) -> pd.DataFrame:
-        model_names = [model.get_simple_name() for model in self._models]
-        models_abbreviations = {model.get_simple_name(): model.get_abbreviation() for model in self._models}
+        model_names = self._known_model_names()
+        models_abbreviations = {model.get_simple_name(): model.get_abbreviation() for model in self._known_models}
         columns = ['Idx', 'Model'] + list(tasks_names)
         rows = [{**{'Idx': model_names.index(model_name) if model_name in model_names else -1,
                     'Model': models_abbreviations.get(model_name, model_name)},
                  **values_per_task}
                 for model_name, values_per_task in self._results.items()]
         return pd.DataFrame(rows, columns=columns)
+
+    def _known_model_names(self):
+        return [model.get_simple_name() for model in self._known_models]
 
     @staticmethod
     def _mark(row, columns, highest_values, table_format):
@@ -126,6 +143,6 @@ class ResultsSummarizer:
 
 
 if __name__ == '__main__':
-    summarizer = ResultsSummarizer('results', 'configs')
+    summarizer = ResultsSummarizer('results', 'configs/main_evaluation_configs.json', True)
     summarizer.create_main_table(sort_by='Idx')
     summarizer.crate_table_per_task_type(sort_by='Idx')

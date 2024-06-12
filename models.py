@@ -5,14 +5,15 @@ from typing import List, Dict, Union
 from mteb.evaluation.evaluators.RetrievalEvaluator import DRESModel
 from gensim.models import KeyedVectors, Word2Vec
 from tqdm import tqdm
-from transformers import AutoTokenizer, AutoModel, BertModel
-
+from transformers import AutoTokenizer, AutoModel
+from FlagEmbedding import BGEM3FlagModel
 from utils import Lemmatizer
 
 model_types = [
     'ST',   # Sentence-Transformer
     'T',    # Transformer
-    'SWE'   # Static Word Embedding
+    'SWE',  # Static Word Embedding
+    'FE'    # FlagEmbedding
 ]
 
 
@@ -27,6 +28,7 @@ class ModelInfo:
     multilingual: bool = False
     fp16: bool = True
     path: str = ''
+    max_length: int = 512
     additional: Dict[str, any] = None
 
     def get_simple_name(self) -> str:
@@ -124,6 +126,26 @@ class TransformerModel:
         inputs = self.tokenizer(batch, padding=True, truncation=True, return_tensors="pt", max_length=max_length)
         with torch.no_grad():
             return self.model(**inputs, output_hidden_states=True, return_dict=True).pooler_output
+
+
+class FlagModel:
+
+    def __init__(self, model_info: ModelInfo):
+        self.model_info = model_info
+        self.model = self._load_model(model_info)
+
+    @staticmethod
+    def _load_model(model_info: ModelInfo):
+        if 'bge-m3' in model_info.model_name:
+            return BGEM3FlagModel(model_info.model_name, use_fp16=model_info.fp16)
+
+    def encode(self, sentences, batch_size=32, **kwargs):
+        embeddings = self.model.encode(sentences,
+                                       batch_size=batch_size,
+                                       max_length=self.model_info.max_length)['dense_vecs']
+        if kwargs.get('convert_to_tensor', False):
+            embeddings = torch.from_numpy(embeddings.astype(np.float32))
+        return embeddings
 
 
 class ModelWrapper:

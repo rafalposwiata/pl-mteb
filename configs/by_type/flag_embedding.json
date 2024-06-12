@@ -1,0 +1,7 @@
+[
+  {
+    "model_name": "BAAI/bge-m3",
+    "model_type": "FE",
+    "multilingual": true
+  }
+]

@@ -11,3 +11,5 @@ torch
 nltk
 spacy==3.4.1
 spacy-download
+sentence-transformers
+FlagEmbedding

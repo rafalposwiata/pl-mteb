@@ -5,30 +5,23 @@
   },
   {
     "model_name": "distiluse-base-multilingual-cased-v2",
+    "model_abbr": "distiluse-base-multi-cased-v2",
     "multilingual": true,
     "fp16": false
   },
   {
     "model_name": "paraphrase-multilingual-MiniLM-L12-v2",
+    "model_abbr": "para-multi-MiniLM-L12-v2",
     "multilingual": true
   },
   {
     "model_name": "paraphrase-multilingual-mpnet-base-v2",
+    "model_abbr": "para-multi-mpnet-base-v2",
     "multilingual": true
   },
   {
-    "model_name": "ipipan/silver-retriever-base-v1",
-    "prefix": "Pytanie:  ",
-    "query_prefix": "Pytanie:  "
-  },
-  {
-    "model_name": "sdadas/st-polish-paraphrase-from-mpnet"
-  },
-  {
-    "model_name": "sdadas/st-polish-paraphrase-from-distilroberta"
-  },
-  {
     "model_name": "intfloat/multilingual-e5-small",
+    "model_abbr": "multi-e5-small",
     "prefix": "query: ",
     "query_prefix": "query: ",
     "passage_prefix": "passage: ",
@@ -36,6 +29,7 @@
   },
   {
     "model_name": "intfloat/multilingual-e5-base",
+    "model_abbr": "multi-e5-base",
     "prefix": "query: ",
     "query_prefix": "query: ",
     "passage_prefix": "passage: ",
@@ -43,10 +37,29 @@
   },
   {
     "model_name": "intfloat/multilingual-e5-large",
+    "model_abbr": "multi-e5-large",
     "prefix": "query: ",
     "query_prefix": "query: ",
     "passage_prefix": "passage: ",
     "multilingual": true
+  },
+  {
+    "model_name": "BAAI/bge-m3",
+    "model_type": "FE",
+    "multilingual": true
+  },
+  {
+    "model_name": "sdadas/st-polish-paraphrase-from-mpnet",
+    "model_abbr": "st-polish-para-from-mpnet"
+  },
+  {
+    "model_name": "sdadas/st-polish-paraphrase-from-distilroberta",
+    "model_abbr": "st-polish-para-from-distilroberta"
+  },
+  {
+    "model_name": "ipipan/silver-retriever-base-v1",
+    "prefix": "Pytanie:  ",
+    "query_prefix": "Pytanie:  "
   },
   {
     "model_name": "sdadas/mmlw-e5-small",
@@ -73,8 +86,5 @@
   {
     "model_name": "sdadas/mmlw-roberta-large",
     "query_prefix": "zapytanie: "
-  },
-  {
-    "model_name": "FajnyKarton/st-polish-kartonberta-base-alpha-v1"
   }
 ]
