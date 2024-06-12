@@ -1,0 +1,10 @@
+{
+  "dataset_revision": null,
+  "mteb_dataset_name": "8TagsClustering",
+  "mteb_version": "1.1.1",
+  "test": {
+    "evaluation_time": 243.48,
+    "v_measure": 0.04561844916258025,
+    "v_measure_std": 0.012416865481176896
+  }
+}

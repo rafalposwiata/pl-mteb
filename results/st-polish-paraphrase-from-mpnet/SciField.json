@@ -1,0 +1,13 @@
+{
+  "dataset_revision": "8064b4442da038aa0482a2542370f9a2441cc50a",
+  "mteb_dataset_name": "SciField",
+  "mteb_version": "1.7.49",
+  "test": {
+    "accuracy": 0.8326147426981919,
+    "accuracy_stderr": 0.027797368307511058,
+    "evaluation_time": 4.0,
+    "f1": 0.8292412060247578,
+    "f1_stderr": 0.028984471614526094,
+    "main_score": 0.8326147426981919
+  }
+}
