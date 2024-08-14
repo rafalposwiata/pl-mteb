@@ -36,3 +36,10 @@ def from_dict(clazz, data):
         return clazz(**{f:from_dict(field_types[f], data[f]) for f in data})
     except:
         return data
+
+
+def get_first_not_none(values):
+    for v in values:
+        if v is not None:
+            return v
+    raise ValueError('All values are None')

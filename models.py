@@ -7,7 +7,7 @@ from gensim.models import KeyedVectors, Word2Vec
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModel
 from FlagEmbedding import BGEM3FlagModel
-from utils import Lemmatizer
+from utils import Lemmatizer, get_first_not_none
 
 model_types = [
     'ST',   # Sentence-Transformer
@@ -29,6 +29,7 @@ class ModelInfo:
     fp16: bool = True
     path: str = ''
     max_length: int = 512
+    batch_size: int = 32
     additional: Dict[str, any] = None
 
     def get_simple_name(self) -> str:
@@ -122,8 +123,8 @@ class TransformerModel:
         return embeddings
 
     def _encode(self, batch):
-        max_length = self.model_info.get_additional_value('max_length', 512)
-        inputs = self.tokenizer(batch, padding=True, truncation=True, return_tensors="pt", max_length=max_length)
+        inputs = self.tokenizer(batch, padding=True, truncation=True, return_tensors="pt",
+                                max_length=self.model_info.max_length)
         with torch.no_grad():
             return self.model(**inputs, output_hidden_states=True, return_dict=True).pooler_output
 
@@ -156,7 +157,9 @@ class ModelWrapper:
 
     def encode(self, sentences, batch_size=32, **kwargs):
         sentences = ['{}{}'.format(self.model_info.prefix, sentence) for sentence in sentences]
-        return self.model.encode(sentences, batch_size=batch_size, **kwargs)
+        _batch_size = get_first_not_none([self.model_info.batch_size, batch_size])
+        return self.model.encode(sentences, batch_size=_batch_size, normalize_embeddings=True,
+                                 show_progress_bar=True, **kwargs)
 
 
 class RetrievalModelWrapper(DRESModel):
@@ -168,9 +171,11 @@ class RetrievalModelWrapper(DRESModel):
     def encode_queries(self, queries: List[Union[str, Dict]], batch_size: int, **kwargs):
         queries = ['{}{}'.format(self.model_info.query_prefix, q if isinstance(q, str) else q.get('text', ''))
                    for q in queries]
-        return self.model.encode(queries, batch_size=batch_size, normalize_embeddings=True, **kwargs)
+        _batch_size = get_first_not_none([self.model_info.batch_size, batch_size])
+        return self.model.encode(queries, batch_size=_batch_size, normalize_embeddings=True, **kwargs)
 
     def encode_corpus(self, corpus: List[Dict[str, str]], batch_size: int, **kwargs):
         passages = ['{}{} {}'.format(self.model_info.passage_prefix, doc.get('title', ''),
                                      doc['text']).strip() for doc in corpus]
-        return self.model.encode(passages, batch_size=batch_size, normalize_embeddings=True, **kwargs)
+        _batch_size = get_first_not_none([self.model_info.batch_size, batch_size])
+        return self.model.encode(passages, batch_size=_batch_size, normalize_embeddings=True, **kwargs)

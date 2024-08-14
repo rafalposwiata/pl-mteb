@@ -1,4 +1,5 @@
 import json
+import torch
 from typing import List
 from mteb import MTEB
 from sentence_transformers import SentenceTransformer
@@ -39,10 +40,11 @@ class PlMtebEvaluator:
                                eval_splits=eval_splits,
                                output_folder=f"results/{model_info.get_simple_name()}")
 
-    @staticmethod
-    def _prepare_base_model(model_info: ModelInfo):
+    def _prepare_base_model(self, model_info: ModelInfo):
         if model_info.model_type == 'ST':
-            model = SentenceTransformer(model_info.model_name)
+            model_kwargs = self._prepare_model_kwargs(model_info)
+            model = SentenceTransformer(model_info.model_name, model_kwargs=model_kwargs)
+            model.max_seq_length = model_info.max_length
             model.eval()
             if model_info.fp16:
                 model.half()
@@ -68,6 +70,19 @@ class PlMtebEvaluator:
         if task_name in new_tasks:
             return new_tasks.get(task_name)
         return task_name
+
+    @staticmethod
+    def _prepare_model_kwargs(model_info: ModelInfo):
+        kwargs = model_info.get_additional_value('model_kwargs')
+        if kwargs is None:
+            return None
+        else:
+            model_kwargs = {}
+            if 'torch_dtype_float16' in kwargs:
+                model_kwargs['torch_dtype'] = torch.float16
+            if 'device_map_auto' in kwargs:
+                model_kwargs['device_map'] = 'auto'
+            return model_kwargs
 
 
 if __name__ == '__main__':
