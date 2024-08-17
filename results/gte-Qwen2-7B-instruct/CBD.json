@@ -1,0 +1,15 @@
+{
+  "dataset_revision": "36ddb419bcffe6a5374c3891957912892916f28d",
+  "mteb_dataset_name": "CBD",
+  "mteb_version": "1.7.49",
+  "test": {
+    "accuracy": 0.7676999999999999,
+    "accuracy_stderr": 0.06707913237363763,
+    "ap": 0.2845414718908804,
+    "ap_stderr": 0.03817143591819779,
+    "evaluation_time": 122.21,
+    "f1": 0.6555246231657762,
+    "f1_stderr": 0.05003498351812261,
+    "main_score": 0.7676999999999999
+  }
+}

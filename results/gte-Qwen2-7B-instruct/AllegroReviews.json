@@ -1,0 +1,13 @@
+{
+  "dataset_revision": "b89853e6de927b0e3bfa8ecc0e56fe4e02ceafc6",
+  "mteb_dataset_name": "AllegroReviews",
+  "mteb_version": "1.7.49",
+  "test": {
+    "accuracy": 0.6255467196819084,
+    "accuracy_stderr": 0.045822893391218415,
+    "evaluation_time": 385.55,
+    "f1": 0.5560659585168625,
+    "f1_stderr": 0.040664396475822345,
+    "main_score": 0.6255467196819084
+  }
+}
