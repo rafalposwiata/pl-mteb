@@ -33,15 +33,18 @@ class ResultsDownloader:
                         metric_type = metric["type"]
                         parts = metric_type.split('_')
                         group = '_'.join(parts[:-1])
+                        if group == "cosine":
+                            group = "cos_sim"
                         metric_name = parts[-1]
-                        metrics_values[group][metric_name] = metric["value"]
+                        if group in metrics_values:
+                            metrics_values[group][metric_name] = metric["value"]
                 else:
                     metrics_values = {metric["type"]: metric["value"] for metric in metrics}
 
                 results_obj = {
                     "dataset_revision": dataset["revision"],
                     "mteb_dataset_name": dataset_name,
-                    "mteb_version": "1.7.49",
+                    "mteb_version": "-",
                     split: {"pl": metrics_values} if is_multilingual else metrics_values
                 }
                 self.save(model_name, dataset_name, results_obj)
@@ -52,8 +55,3 @@ class ResultsDownloader:
         Path(dir_path).mkdir(exist_ok=True)
         with open(f'{dir_path}/{task_name}.json', 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
-
-
-if __name__ == '__main__':
-    downloader = ResultsDownloader()
-    downloader.download('Alibaba-NLP/gte-Qwen2-7B-instruct')

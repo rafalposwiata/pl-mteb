@@ -83,7 +83,7 @@ class LeaderboardData:
     @staticmethod
     def _normalize(value) -> float:
         v = value[0] if isinstance(value, list) else value
-        return round(100 * v, 5)
+        return round(100 * v if v < 1 else value, 5)
 
     @staticmethod
     def save(data) -> None:

@@ -2,8 +2,7 @@
 <p align="center">
     <a href="https://arxiv.org/abs/2405.10138"><img src="https://img.shields.io/badge/arXiv-2405.10138-b31b1b.svg"></a>
     <a href="https://huggingface.co/PL-MTEB"><img src="https://img.shields.io/badge/PL_MTEB-🤗-yellow"></a>
-     <a href="https://huggingface.co/spaces/mteb/leaderboard"><img src="https://img.shields.io/badge/%F0%9F%8F%86-leaderboard-8A2BE2"></a>
-    <a href="https://www.python.org/"><img alt="Build" src="https://img.shields.io/badge/Made with-Python-green"></a>
+     <a href="https://huggingface.co/spaces/PL-MTEB/leaderboard"><img src="https://img.shields.io/badge/%F0%9F%8F%86-leaderboard-8A2BE2"></a>
 </p>
 
 ## 💻 Installation
@@ -20,7 +19,7 @@ pip install -r requirements.txt
 python run_evaluation.py --models_config <PATH_TO_MODELS_CONFIG_FILE>
 
 Example:
-python run_evaluation.py --models_config configs/sentence_transformers.json
+python run_evaluation.py --models_config configs/main_evaluation_configs.json
 ```
 
 ## 📜 Citation

@@ -30,6 +30,9 @@ tasks: List[TaskInfo] = [
     TaskInfo('PPC', 'PairClassification'),
     TaskInfo('CDSC-E', 'PairClassification'),
     TaskInfo('PSC', 'PairClassification'),
+    TaskInfo('SICK-R-PL', 'STS'),
+    TaskInfo('CDSC-R', 'STS'),
+    TaskInfo('STS22', 'STS', multilingual=True),
     TaskInfo('ArguAna-PL', 'Retrieval'),
     TaskInfo('DBPedia-PL', 'Retrieval'),
     TaskInfo('FiQA-PL', 'Retrieval'),
@@ -41,10 +44,7 @@ tasks: List[TaskInfo] = [
     TaskInfo('SCIDOCS-PL', 'Retrieval'),
     TaskInfo('SciFact-PL', 'Retrieval'),
     TaskInfo('TRECCOVID-PL', 'Retrieval'),
-    TaskInfo('SciDefRetrieval', 'Retrieval'),
-    TaskInfo('SICK-R-PL', 'STS'),
-    TaskInfo('CDSC-R', 'STS'),
-    TaskInfo('STS22', 'STS', multilingual=True),
+    TaskInfo('SciDefRetrieval', 'Retrieval')
 ]
 
 tasks_and_types = {task.name: task.task_type for task in tasks}

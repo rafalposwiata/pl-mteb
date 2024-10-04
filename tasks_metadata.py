@@ -81,7 +81,7 @@ _STS22_LANGUAGES = {
 tasks_metadata = {
     "CBD": TaskMetadata(
         name="CBD",
-        description="Polish Tweets annotated for cyberbullying detection.",
+        description="Polish Tweets annotated for cyberbullying detection. Creation procedure: [] #unbalanced",
         reference="http://2019.poleval.pl/files/poleval2019.pdf",
         dataset={
             "path": "PL-MTEB/cbd",
@@ -116,7 +116,7 @@ tasks_metadata = {
     "PolEmo2.0-IN": TaskMetadata(
         name="PolEmo2.0-IN",
         description="A collection of Polish online reviews from four domains: medicine, hotels, products and "
-                    "school. The PolEmo2.0-IN task is to predict the sentiment of in-domain (medicine and hotels) reviews.",
+                    "school. The PolEmo2.0-IN task is to predict the sentiment of in-domain (medicine and hotels) reviews. #unbalanced",
         reference="https://aclanthology.org/K19-1092.pdf",
         dataset={
             "path": "PL-MTEB/polemo2_in",
@@ -158,7 +158,7 @@ tasks_metadata = {
         name="PolEmo2.0-OUT",
         description="A collection of Polish online reviews from four domains: medicine, hotels, products and "
                     "school. The PolEmo2.0-OUT task is to predict the sentiment of out-of-domain (products and "
-                    "school) reviews using models train on reviews from medicine and hotels domains.",
+                    "school) reviews using models train on reviews from medicine and hotels domains. #unbalanced",
         reference="https://aclanthology.org/K19-1092.pdf",
         dataset={
             "path": "PL-MTEB/polemo2_out",
@@ -184,7 +184,7 @@ tasks_metadata = {
     ),
     "AllegroReviews": TaskMetadata(
         name="AllegroReviews",
-        description="A Polish dataset for sentiment classification on reviews from e-commerce marketplace Allegro.",
+        description="A Polish dataset for sentiment classification on reviews from e-commerce marketplace Allegro. #unbalanced",
         reference="https://aclanthology.org/2020.acl-main.111.pdf",
         dataset={
             "path": "PL-MTEB/allegro-reviews",
@@ -210,7 +210,7 @@ tasks_metadata = {
     ),
     "PAC": TaskMetadata(
         name="PAC",
-        description="Polish Abusive Clauses Dataset",
+        description="Polish Abusive Clauses Dataset #unbalanced",
         reference="https://arxiv.org/pdf/2211.13112.pdf",
         dataset={
             "path": "laugustyniak/abusive-clauses-pl",
@@ -240,7 +240,7 @@ tasks_metadata = {
             "path": "mteb/amazon_massive_intent",
             "revision": "4672e20407010da34463acc759c162ca9734bca6",
         },
-        description="MASSIVE: A 1M-Example Multilingual Natural Language Understanding Dataset with 51 Typologically-Diverse Languages",
+        description="MASSIVE: A 1M-Example Multilingual Natural Language Understanding Dataset with 51 Typologically-Diverse Languages #unbalanced",
         reference="https://arxiv.org/abs/2204.08582#:~:text=MASSIVE%20contains%201M%20realistic%2C%20parallel,diverse%20languages%20from%2029%20genera.",
         category="s2s",
         type="Classification",
@@ -273,7 +273,7 @@ tasks_metadata = {
             "path": "mteb/amazon_massive_scenario",
             "revision": "fad2c6e8459f9e1c45d9315f4953d921437d70f8",
         },
-        description="MASSIVE: A 1M-Example Multilingual Natural Language Understanding Dataset with 51 Typologically-Diverse Languages",
+        description="MASSIVE: A 1M-Example Multilingual Natural Language Understanding Dataset with 51 Typologically-Diverse Languages #unbalanced",
         reference="https://arxiv.org/abs/2204.08582#:~:text=MASSIVE%20contains%201M%20realistic%2C%20parallel,diverse%20languages%20from%2029%20genera.",
         category="s2s",
         type="Classification",
@@ -303,7 +303,7 @@ tasks_metadata = {
     "SciField": TaskMetadata(
         name="SciField",
         description="Based on the paragraph from the coursebook, identify the scientific field from which it comes. "
-                    "Available fields are: chemistry, physics, mathematics, geology  and social science.",
+                    "Available fields are: chemistry, physics, mathematics, geology  and social science. #unbalanced",
         reference="https://huggingface.co/datasets/rafalposwiata/open-coursebooks-pl",
         dataset={
             "path": "PL-MTEB/scifield",
