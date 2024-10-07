@@ -62,6 +62,9 @@
     "query_prefix": "Pytanie:  "
   },
   {
+    "model_name": "OrlikB/KartonBERT-USE-base-v1"
+  },
+  {
     "model_name": "sdadas/mmlw-e5-small",
     "prefix": "query: ",
     "query_prefix": "query: ",
