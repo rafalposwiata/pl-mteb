@@ -1,92 +1,53 @@
-import json
-import torch
+import mteb
+import logging
+from time import time
 from typing import List
 from mteb import MTEB
-from sentence_transformers import SentenceTransformer
-from models import ModelInfo, ModelWrapper, RetrievalModelWrapper, KeyedVectorsModel, TransformerModel, FlagModel
 from transformers import HfArgumentParser
-from tasks import TaskInfo, tasks, new_tasks
+from tasks import prepare_tasks
 from dataclasses import dataclass, field
-from utils import from_dict
+from datetime import timedelta
 
 
 @dataclass
-class PlMtebArgs:
-    models_config: str = field(
-        metadata={"help": "Path to models config file."},
-        default="configs/sentence_transformers.json"
+class PL_MTEBArgs:
+    model: str = field(
+        metadata={"help": "Path or name of model to evaluate."},
+        default=None
+    )
+    models: str = field(
+        metadata={"help": "Path to file with models to evaluate."},
+        default="configs/models.txt"
     )
 
-    def load_model_infos(self) -> List[ModelInfo]:
-        with open(self.models_config, "r", encoding="utf-8") as config_file:
-            return [from_dict(ModelInfo, model_info) for model_info in json.load(config_file)]
+    def load_model_names(self) -> List[str]:
+        if self.model is not None:
+            return [self.model]
+        else:
+            with open(self.models, "r", encoding="utf-8") as file:
+                return [line.strip() for line in file if not line.startswith("#") and line.strip() != ""]
 
 
-class PlMtebEvaluator:
+class PL_MTEBEvaluator:
 
-    def __init__(self, args: PlMtebArgs):
+    def __init__(self, args: PL_MTEBArgs):
         self.args = args
 
     def run(self) -> None:
-        for model_info in self.args.load_model_infos():
-            print(f'Evaluating model: {model_info.model_name}')
-            base_model = self._prepare_base_model(model_info)
-            for task_info in tasks:
-                model = self._prepare_task_model(base_model, model_info, task_info)
-                task = self._get_task(task_info)
-                eval_splits = ['validation'] if task_info.name == 'MSMARCO-PL' else ['test']
-                evaluation = MTEB(tasks=[task], task_langs=["pl"])
-                evaluation.run(model,
-                               eval_splits=eval_splits,
-                               output_folder=f"results/{model_info.get_simple_name()}")
-
-    def _prepare_base_model(self, model_info: ModelInfo):
-        if model_info.model_type == 'ST':
-            model_kwargs = self._prepare_model_kwargs(model_info)
-            model = SentenceTransformer(model_info.model_name, model_kwargs=model_kwargs)
-            model.max_seq_length = model_info.max_length
-            model.eval()
-            if model_info.fp16:
-                model.half()
-        elif model_info.model_type == 'T':
-            model = TransformerModel(model_info)
-        elif model_info.model_type == 'SWE':
-            model = KeyedVectorsModel(model_info)
-        elif model_info.model_type == 'FE':
-            model = FlagModel(model_info)
-        else:
-            raise Exception(f'Unknown type of model: {model_info.model_type}.')
-        return model
-
-    @staticmethod
-    def _prepare_task_model(base_model, model_info: ModelInfo, task_info: TaskInfo):
-        if task_info.task_type == 'Retrieval':
-            return RetrievalModelWrapper(base_model, model_info)
-        return ModelWrapper(base_model, model_info)
-
-    @staticmethod
-    def _get_task(task_info: TaskInfo):
-        task_name = task_info.name
-        if task_name in new_tasks:
-            return new_tasks.get(task_name)
-        return task_name
-
-    @staticmethod
-    def _prepare_model_kwargs(model_info: ModelInfo):
-        kwargs = model_info.get_additional_value('model_kwargs')
-        if kwargs is None:
-            return None
-        else:
-            model_kwargs = {}
-            if 'torch_dtype_float16' in kwargs:
-                model_kwargs['torch_dtype'] = torch.float16
-            if 'device_map_auto' in kwargs:
-                model_kwargs['device_map'] = 'auto'
-            return model_kwargs
+        for model_name in self.args.load_model_names():
+            model = mteb.get_model(model_name)
+            logging.info(f"Evaluating model: {model_name}")
+            start_time = time()
+            evaluation = MTEB(tasks=prepare_tasks())
+            evaluation.run(model, output_folder="eval_results")
+            logging.info(f"Evaluating model {model_name} took {timedelta(seconds=time() - start_time)}.")
 
 
 if __name__ == '__main__':
-    parser = HfArgumentParser([PlMtebArgs])
+    logging.basicConfig(format="%(asctime)s : %(message)s", level=logging.INFO)
+    logging.root.setLevel(logging.INFO)
+
+    parser = HfArgumentParser([PL_MTEBArgs])
     args = parser.parse_args_into_dataclasses()[0]
-    evaluator = PlMtebEvaluator(args)
+    evaluator = PL_MTEBEvaluator(args)
     evaluator.run()

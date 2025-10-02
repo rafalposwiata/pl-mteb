@@ -1,0 +1,5 @@
+# ----------- Multilingual Sentence Transformers -----------
+sentence-transformers/distiluse-base-multilingual-cased-v2
+
+# ----------- Polish Sentence Transformers -----------
+sdadas/mmlw-roberta-large

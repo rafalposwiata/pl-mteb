@@ -16,10 +16,12 @@ pip install -r requirements.txt
 ## 🔨 Usage
 
 ```bash
-python run_evaluation.py --models_config <PATH_TO_MODELS_CONFIG_FILE>
+python run_evaluation.py --model <MODEL>
+or
+python run_evaluation.py --models <PATH_TO_FILE_WITH_MODELS> # e.g. configs/models.txt
 
 Example:
-python run_evaluation.py --models_config configs/main_evaluation_configs.json
+python run_evaluation.py --model sdadas/mmlw-roberta-large
 ```
 
 ## 📜 Citation
