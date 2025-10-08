@@ -5,19 +5,19 @@ from tasks_metadata import tasks_metadata
 
 tasks: dict[str, List[str]] = {
     "Classification": [
-        "CBD",
-        "PolEmo2.0-IN",
-        "PolEmo2.0-OUT",
-        "AllegroReviews",
-        "PAC",
+        "CBD.v2",
+        "PolEmo2.0-IN.v2",
+        "PolEmo2.0-OUT.v2",
+        "AllegroReviews.v2",
+        "PAC.v2",
         "MassiveIntentClassification",
         "MassiveScenarioClassification",
         "SciField"
     ],
     "Clustering": [
-        "EightTagsClustering",
-        "PlscClusteringS2S",
-        "PlscClusteringP2P",
+        "EightTagsClustering.v2",
+        "PlscClusteringS2S.v2",
+        "PlscClusteringP2P.v2",
         "WikinewsPlClusteringS2S",
         "WikinewsPlClusteringP2P"
     ],
@@ -30,17 +30,17 @@ tasks: dict[str, List[str]] = {
     "STS": [
         "SICK-R-PL",
         "CDSC-R",
-        "STS22"
+        "STS22.v2"
     ],
     "Retrieval": [
         "ArguAna-PL",
-        "DBPedia-PL",
+        "DBPedia-PLHardNegatives",
         "FiQA-PL",
-        "HotpotQA-PL",
-        "MSMARCO-PL",
+        "HotpotQA-PLHardNegatives",
+        "MSMARCO-PLHardNegatives",
         "NFCorpus-PL",
-        "NQ-PL",
-        "Quora-PL",
+        "NQ-PLHardNegatives",
+        "Quora-PLHardNegatives",
         "SCIDOCS-PL",
         "SciFact-PL",
         "TRECCOVID-PL",
@@ -70,8 +70,6 @@ def prepare_tasks() -> MTEBTasks:
     for task_name in tasks_names:
         if task_name == "STS22":
             _tasks += (get_task(task_name, eval_splits=["test"], hf_subsets=["pl"]),)
-        elif task_name == "MSMARCO-PL":
-            _tasks += (get_task(task_name, eval_splits=["validation"]),)
         else:
             _tasks += (get_task(task_name, languages=["pol"]),)
     return MTEBTasks(_tasks)
