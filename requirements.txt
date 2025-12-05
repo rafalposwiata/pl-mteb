@@ -1,4 +1,4 @@
-mteb==1.39.1
+mteb==2.3.2
 datasets==2.21.0
 pandas==1.5.2
 tabulate==0.9.0

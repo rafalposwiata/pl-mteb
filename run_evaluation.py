@@ -2,11 +2,11 @@ import mteb
 import logging
 from time import time
 from typing import List
-from mteb import MTEB
 from transformers import HfArgumentParser
 from tasks import prepare_tasks
 from dataclasses import dataclass, field
 from datetime import timedelta
+from mteb.cache import ResultCache
 
 
 @dataclass
@@ -38,8 +38,7 @@ class PL_MTEBEvaluator:
             model = mteb.get_model(model_name)
             logging.info(f"Evaluating model: {model_name}")
             start_time = time()
-            evaluation = MTEB(tasks=prepare_tasks())
-            evaluation.run(model, output_folder="eval_results")
+            mteb.evaluate(model, prepare_tasks(), cache=ResultCache(cache_path="eval_results"))
             logging.info(f"Evaluating model {model_name} took {timedelta(seconds=time() - start_time)}.")
 
 

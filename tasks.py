@@ -1,7 +1,10 @@
-from typing import List
-from mteb import AbsTaskClusteringFast, AbsTaskClassification, AbsTaskRetrieval, overview
-from mteb.overview import MTEBTasks, get_task
+import mteb
+from mteb.abstasks.clustering import AbsTaskClustering
+from mteb.abstasks.classification import AbsTaskClassification
+from mteb.abstasks.retrieval import AbsTaskRetrieval
+from mteb.get_tasks import MTEBTasks, _TASKS_REGISTRY
 from tasks_metadata import tasks_metadata
+from typing import List
 
 tasks: dict[str, List[str]] = {
     "Classification": [
@@ -69,17 +72,17 @@ def prepare_tasks() -> MTEBTasks:
     _tasks = ()
     for task_name in tasks_names:
         if task_name == "STS22":
-            _tasks += (get_task(task_name, eval_splits=["test"], hf_subsets=["pl"]),)
+            _tasks += (mteb.get_task(task_name, eval_splits=["test"], hf_subsets=["pl"]),)
         else:
-            _tasks += (get_task(task_name, languages=["pol"]),)
+            _tasks += (mteb.get_task(task_name, languages=["pol"]),)
     return MTEBTasks(_tasks)
 
 
-class WikinewsPlClusteringS2S(AbsTaskClusteringFast):
+class WikinewsPlClusteringS2S(AbsTaskClustering):
     metadata = tasks_metadata["WikinewsPlClusteringS2S"]
 
 
-class WikinewsPlClusteringP2P(AbsTaskClusteringFast):
+class WikinewsPlClusteringP2P(AbsTaskClustering):
     metadata = tasks_metadata["WikinewsPlClusteringP2P"]
 
 
@@ -91,7 +94,7 @@ class SciDefRetrieval(AbsTaskRetrieval):
     metadata = tasks_metadata["SciDefRetrieval"]
 
 
-overview.TASKS_REGISTRY["WikinewsPlClusteringS2S"] = WikinewsPlClusteringS2S
-overview.TASKS_REGISTRY["WikinewsPlClusteringP2P"] = WikinewsPlClusteringP2P
-overview.TASKS_REGISTRY["SciField"] = SciFieldClassification
-overview.TASKS_REGISTRY["SciDefRetrieval"] = SciDefRetrieval
+_TASKS_REGISTRY["WikinewsPlClusteringS2S"] = WikinewsPlClusteringS2S
+_TASKS_REGISTRY["WikinewsPlClusteringP2P"] = WikinewsPlClusteringP2P
+_TASKS_REGISTRY["SciField"] = SciFieldClassification
+_TASKS_REGISTRY["SciDefRetrieval"] = SciDefRetrieval
