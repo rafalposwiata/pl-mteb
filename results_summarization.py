@@ -2,7 +2,7 @@ from typing import List
 import pandas as pd
 from mteb.cache import ResultCache
 from tabulate import tabulate
-from tasks import tasks_names, prepare_tasks, tasks
+from tasks.tasks import tasks_names, prepare_tasks, tasks
 
 def wrap_with_marker(value, table_format, best_score: bool = True) -> str:
     if table_format == 'latex_raw':

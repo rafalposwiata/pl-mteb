@@ -3,7 +3,7 @@ from mteb.abstasks.clustering import AbsTaskClustering
 from mteb.abstasks.classification import AbsTaskClassification
 from mteb.abstasks.retrieval import AbsTaskRetrieval
 from mteb.get_tasks import MTEBTasks, _TASKS_REGISTRY
-from tasks_metadata import tasks_metadata
+from tasks.tasks_metadata import tasks_metadata
 from typing import List
 
 tasks: dict[str, List[str]] = {

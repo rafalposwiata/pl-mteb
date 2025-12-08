@@ -3,7 +3,7 @@ import logging
 from time import time
 from typing import List
 from transformers import HfArgumentParser
-from tasks import prepare_tasks
+from tasks.tasks import prepare_tasks
 from dataclasses import dataclass, field
 from datetime import timedelta
 from mteb.cache import ResultCache
