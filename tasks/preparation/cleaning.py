@@ -56,7 +56,7 @@ class DatasetCleaner:
             text = text.strip()
             if to_lower:
                 text = text.lower()
-            if remove_multiple_spaces:
+            if normalized_spaces:
                 text = remove_multiple_spaces(text)
             if text not in unique_texts:
                 unique_texts.add(text)

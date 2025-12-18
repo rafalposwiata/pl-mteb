@@ -47,7 +47,18 @@ class PolEmo2Out(BaseTask):
         self.rename_column("target", "label")
 
 
+class MassiveIntent(BaseTask):
 
+    def __init__(self):
+        super().__init__("massive_intent", "mteb/amazon_massive_intent", TaskType.CLASSIFICATION,
+                         subset="pl", min_words=2)
+
+
+class MassiveScenario(BaseTask):
+
+    def __init__(self):
+        super().__init__("massive_scenario", "mteb/amazon_massive_scenario", TaskType.CLASSIFICATION,
+                         subset="pl", min_words=2)
 
 
 if __name__ == '__main__':
@@ -60,6 +71,8 @@ if __name__ == '__main__':
         PAC,
         PolEmo2In,
         PolEmo2Out,
+        MassiveIntent,
+        MassiveScenario
     ]:
         _task = task()
         logging.info(f"Preparing {_task.name}")
