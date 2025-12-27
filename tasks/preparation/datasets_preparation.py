@@ -17,7 +17,7 @@ class TaskType(Enum):
 
 
 
-class AbsTask(ABC):
+class AbsDataset(ABC):
 
     def __init__(self, name: str, hf_path: str, task_type: TaskType, subset: str = None):
         self.name: str = name
@@ -76,7 +76,7 @@ class AbsTask(ABC):
             raise ValueError()
 
 
-class BaseTask(AbsTask):
+class BaseDataset(AbsDataset):
 
     def __init__(self, name: str, hf_path: str, task_type: TaskType, subset: str = None, text_column: str = "text",
                  label_column: str = "label", min_words: int = 3):
