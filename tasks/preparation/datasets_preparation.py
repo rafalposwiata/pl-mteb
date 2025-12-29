@@ -1,8 +1,8 @@
 import json
 import os
+from typing import List
 import datasets
 import logging
-import numpy as np
 from enum import Enum
 from abc import ABC, abstractmethod
 from datasets import DatasetDict, Dataset
@@ -64,6 +64,16 @@ class BaseDataset(AbsDataset):
 
     def rename_column(self, name: str, new_name: str) -> None:
         self.dataset = self.dataset.rename_column(name, new_name)
+
+    def remove_columns(self, names: List[str]) -> None:
+        self.dataset = self.dataset.remove_columns(names)
+
+    def merge_columns(self, columns: List[str], new_column_name: str) -> None:
+        def merge_func(row):
+            row[new_column_name] =  " ".join([row[column] for column in columns])
+            return row
+        for split in self.dataset.keys():
+            self.dataset[split] = self.dataset[split].map(merge_func)
 
     def class_encode_column(self, column_name: str) -> None:
         self.dataset = self.dataset.class_encode_column(column_name)

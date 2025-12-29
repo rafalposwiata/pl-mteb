@@ -47,16 +47,36 @@ class PolEmo2Out(BaseDataset):
         self.rename_column("target", "label")
 
 
+class SickrPL(BaseDataset):
+
+    def __init__(self):
+        super().__init__("sickr_pl", "sdadas/sick_pl", TaskType.STS)
+
+    def preprocess_dataset(self) -> None:
+        self.remove_columns(["pair_ID", "entailment_judgment"])
+        self.merge_columns(["sentence_A", "sentence_B"], "text")
+        self.rename_column("sentence_A", "sentence1")
+        self.rename_column("sentence_B", "sentence2")
+        self.rename_column("relatedness_score", "score")
+
+    def save(self):
+        self.remove_columns(["text"])
+        super().save()
+
+
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(message)s', level=logging.INFO)
     logging.root.setLevel(logging.INFO)
 
     for task in [
-        AllegroReviews,
-        CBD,
-        PAC,
-        PolEmo2In,
-        PolEmo2Out
+        # AllegroReviews,
+        # CBD,
+        # PAC,
+        # PolEmo2In,
+        # PolEmo2Out,
+
+        # SickrPL,
+
     ]:
         _task = task()
         logging.info(f"Preparing {_task.name}")
