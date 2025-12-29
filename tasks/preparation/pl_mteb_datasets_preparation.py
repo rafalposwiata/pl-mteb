@@ -66,7 +66,7 @@ class SickrPL(BaseDataset):
 class SickePL(BaseDataset):
 
     def __init__(self):
-        super().__init__("sicke_pl", "sdadas/sick_pl", TaskType.STS)
+        super().__init__("sicke_pl", "sdadas/sick_pl", TaskType.PAIR_CLASSIFICATION)
 
     def preprocess_dataset(self) -> None:
         self.merge_columns(["sentence_A", "sentence_B"], "text")
@@ -84,20 +84,33 @@ class SickePL(BaseDataset):
         super().save()
 
 
+class EightTags(BaseDataset):
+
+    def __init__(self):
+        super().__init__("8tags", "sdadas/8tags", TaskType.CLUSTERING, text_column="sentences")
+
+    def preprocess_dataset(self) -> None:
+        self.rename_column("sentence", "sentences")
+        self.rename_column("label", "labels")
+
+
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(message)s', level=logging.INFO)
     logging.root.setLevel(logging.INFO)
 
     for task in [
+        # --------- Classification ---------
         # AllegroReviews,
         # CBD,
         # PAC,
         # PolEmo2In,
         # PolEmo2Out,
-
+        # --------- STS ---------
         # SickrPL,
-
-        SickePL
+        # --------- Pair Classification ---------
+        # SickePL
+        # --------- Clustering ---------
+        EightTags
     ]:
         _task = task()
         logging.info(f"Preparing {_task.name}")
