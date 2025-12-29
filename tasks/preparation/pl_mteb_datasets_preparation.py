@@ -53,14 +53,34 @@ class SickrPL(BaseDataset):
         super().__init__("sickr_pl", "sdadas/sick_pl", TaskType.STS)
 
     def preprocess_dataset(self) -> None:
-        self.remove_columns(["pair_ID", "entailment_judgment"])
         self.merge_columns(["sentence_A", "sentence_B"], "text")
         self.rename_column("sentence_A", "sentence1")
         self.rename_column("sentence_B", "sentence2")
         self.rename_column("relatedness_score", "score")
 
     def save(self):
-        self.remove_columns(["text"])
+        self.remove_columns(["pair_ID", "entailment_judgment", "text"])
+        super().save()
+
+
+class SickePL(BaseDataset):
+
+    def __init__(self):
+        super().__init__("sicke_pl", "sdadas/sick_pl", TaskType.STS)
+
+    def preprocess_dataset(self) -> None:
+        self.merge_columns(["sentence_A", "sentence_B"], "text")
+        self.rename_column("sentence_A", "sentence1")
+        self.rename_column("sentence_B", "sentence2")
+
+        def map_label(row):
+            row["labels"] = 1 if row["entailment_judgment"] == "ENTAILMENT" else 0
+            return row
+
+        self.map(map_label)
+
+    def save(self):
+        self.remove_columns(["pair_ID", "relatedness_score", "entailment_judgment", "text"])
         super().save()
 
 
@@ -77,6 +97,7 @@ if __name__ == '__main__':
 
         # SickrPL,
 
+        SickePL
     ]:
         _task = task()
         logging.info(f"Preparing {_task.name}")

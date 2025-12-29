@@ -72,8 +72,11 @@ class BaseDataset(AbsDataset):
         def merge_func(row):
             row[new_column_name] =  " ".join([row[column] for column in columns])
             return row
+        self.map(merge_func)
+
+    def map(self, map_func):
         for split in self.dataset.keys():
-            self.dataset[split] = self.dataset[split].map(merge_func)
+            self.dataset[split] = self.dataset[split].map(map_func)
 
     def class_encode_column(self, column_name: str) -> None:
         self.dataset = self.dataset.class_encode_column(column_name)
