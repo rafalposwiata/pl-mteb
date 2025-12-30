@@ -4,8 +4,7 @@ from tasks.preparation.datasets_preparation import BaseDataset, TaskType
 
 class AllegroReviews(BaseDataset):
     def __init__(self):
-        super().__init__("allegro_reviews", "allegro/klej-allegro-reviews", TaskType.CLASSIFICATION,
-                         min_words=1) # Short, one-word texts such as “ok” and “super” should be retained because they express sentiment.
+        super().__init__("allegro_reviews", "allegro/klej-allegro-reviews", TaskType.CLASSIFICATION)
 
     def preprocess_dataset(self) -> None:
         self.rename_column("rating", "label")
@@ -100,17 +99,17 @@ if __name__ == '__main__':
 
     for task in [
         # --------- Classification ---------
-        # AllegroReviews,
-        # CBD,
-        # PAC,
-        # PolEmo2In,
-        # PolEmo2Out,
+        AllegroReviews,
+        CBD,
+        PAC,
+        PolEmo2In,
+        PolEmo2Out,
         # --------- STS ---------
         # SickrPL,
         # --------- Pair Classification ---------
-        # SickePL
+        # SickePL,
         # --------- Clustering ---------
-        EightTags
+        # EightTags
     ]:
         _task = task()
         logging.info(f"Preparing {_task.name}")

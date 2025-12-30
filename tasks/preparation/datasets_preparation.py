@@ -51,7 +51,7 @@ class BaseDataset(AbsDataset):
         self.label_column: str = label_column
         self.dataset = self.load(hf_path, subset)
         self.preprocess_dataset()
-        self.cleaner = DatasetCleaner(text_column, min_words)
+        self.cleaner = DatasetCleaner(text_column, label_column, min_words)
 
     @staticmethod
     def load(hf_path, subset):
@@ -104,8 +104,8 @@ class RetrievalDataset(AbsDataset):
         return DatasetDict(dataset)
 
     def clean(self) -> None:
-        self.dataset, cleaning_result = self.cleaner.clean(self.dataset, text_column="text", validate_leakage=False,
-                                                           skip_splits=["qrels"])
+        self.dataset, cleaning_result = self.cleaner.clean(self.dataset, text_column="text", validate_labels=False,
+                                                           validate_leakage=False, skip_splits=["qrels"])
         queries_ids = set(self.dataset["queries"]["_id"])
         passages_ids = set(self.dataset["passages"]["_id"])
         self.dataset["qrels"] = self.dataset["qrels"].filter(lambda row: row["query-id"] in queries_ids
