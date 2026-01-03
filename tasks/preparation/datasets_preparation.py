@@ -58,7 +58,7 @@ class BaseDataset(AbsDataset):
         return datasets.load_dataset(hf_path, subset, verification_mode=None)
 
     def clean(self) -> None:
-        self.dataset, cleaning_result = self.cleaner.clean(self.dataset)
+        self.dataset, cleaning_result = self.cleaner.clean(self.dataset, score_labels=self.task_type == TaskType.STS)
         logging.info(f"Cleaning result: {cleaning_result}")
         self.save_json("cleaning_result.json", cleaning_result)
 

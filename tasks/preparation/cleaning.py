@@ -26,7 +26,7 @@ class DatasetCleaner:
         self.min_words: int = min_words
         self.only_exact_comparisons: bool = only_exact_comparisons
 
-    def clean(self, dataset: DatasetDict, text_column: str = None, validate_labels: bool = True,
+    def clean(self, dataset: DatasetDict, text_column: str = None, validate_labels: bool = True, score_labels: bool = False,
               validate_leakage: bool = True, skip_splits: List = None) -> tuple[DatasetDict, dict[str, dict]]:
         if self.text_column is None:
             self.text_column = text_column
@@ -39,12 +39,12 @@ class DatasetCleaner:
                     self.execute_filter(dataset, split, report, func_name, func)
 
         if validate_labels:
-            dataset = self.filter_unclear_label(dataset, report)
+            dataset = self.filter_unclear_label(dataset, report, score_labels)
 
         for split in dataset.keys():
             if skip_splits is None or split not in skip_splits:
-                self.execute_filter(dataset, split, report, "deduplicate_normalized",
-                                    lambda ds: self.deduplicate(ds, True))
+                for func_name in ["deduplicate_exact", "deduplicate_normalized"]:
+                    self.execute_filter(dataset, split, report, func_name, lambda ds: self.deduplicate(ds, "normalized" in func_name))
 
         if validate_leakage:
             for split in dataset.keys():
@@ -70,7 +70,6 @@ class DatasetCleaner:
     def get_cleaning_funcs(self) -> List[tuple]:
         return [
             ("empty_texts", self.filter_empty),
-            ("deduplicate_exact", self.deduplicate),
             ("short_texts", self.filter_short_texts)
         ]
 
@@ -92,14 +91,24 @@ class DatasetCleaner:
     def filter_short_texts(self, dataset: Dataset) -> Dataset:
         return dataset.filter(lambda row: len(row[self.text_column].strip().split()) >= self.min_words)
 
-    def filter_unclear_label(self, dataset: DatasetDict, report: dict) -> DatasetDict:
+    def filter_unclear_label(self, dataset: DatasetDict, report: dict, score_labels: bool) -> DatasetDict:
+        def is_unclear(labels) -> bool:
+            if score_labels:
+                if len(labels) == 1:
+                    return False
+                labels = sorted(labels, reverse=True)
+                _diff = labels[0] - labels[-1]
+                return _diff > 0.5
+            else:
+                return len(labels) > 1
+
         all_texts = defaultdict(set)
 
         for ds in dataset.values():
             for text, label in zip(ds[self.text_column], ds[self.label_column]):
                 all_texts[normalize_text(text)].add(label)
 
-        texts_with_unclear_label = {t for t, labels in all_texts.items() if len(labels) > 1}
+        texts_with_unclear_label = {t for t, labels in all_texts.items() if is_unclear(labels)}
         for split in dataset.keys():
             before = dataset[split].num_rows
             dataset[split] = dataset[split].filter(

@@ -1,4 +1,5 @@
 import logging
+from datasets import Dataset
 from tasks.preparation.datasets_preparation import BaseDataset, TaskType
 
 
@@ -49,7 +50,7 @@ class PolEmo2Out(BaseDataset):
 class SickrPL(BaseDataset):
 
     def __init__(self):
-        super().__init__("sickr_pl", "sdadas/sick_pl", TaskType.STS)
+        super().__init__("sickr_pl", "sdadas/sick_pl", TaskType.STS, label_column="score")
 
     def preprocess_dataset(self) -> None:
         self.merge_columns(["sentence_A", "sentence_B"], "text")
@@ -65,7 +66,7 @@ class SickrPL(BaseDataset):
 class SickePL(BaseDataset):
 
     def __init__(self):
-        super().__init__("sicke_pl", "sdadas/sick_pl", TaskType.PAIR_CLASSIFICATION)
+        super().__init__("sicke_pl", "sdadas/sick_pl", TaskType.PAIR_CLASSIFICATION, label_column="labels")
 
     def preprocess_dataset(self) -> None:
         self.merge_columns(["sentence_A", "sentence_B"], "text")
@@ -80,6 +81,51 @@ class SickePL(BaseDataset):
 
     def save(self):
         self.remove_columns(["pair_ID", "relatedness_score", "entailment_judgment", "text"])
+        for split in self.dataset.keys():
+            self.dataset[split] = Dataset.from_dict(
+                {column: [self.dataset[split][column]] for column in ["sentence1", "sentence2", "labels"]}
+            )
+        super().save()
+
+
+class Cdsc_r(BaseDataset):
+
+    def __init__(self):
+        super().__init__("cdsc-r", "allegro/klej-cdsc-r", TaskType.STS, label_column="score")
+
+    def preprocess_dataset(self) -> None:
+        self.merge_columns(["sentence_A", "sentence_B"], "text")
+        self.rename_column("sentence_A", "sentence1")
+        self.rename_column("sentence_B", "sentence2")
+        self.rename_column("relatedness_score", "score")
+
+    def save(self):
+        self.remove_columns(["pair_ID", "text"])
+        super().save()
+
+
+class Cdsc_e(BaseDataset):
+
+    def __init__(self):
+        super().__init__("cdsc-e", "allegro/klej-cdsc-e", TaskType.PAIR_CLASSIFICATION, label_column="labels")
+
+    def preprocess_dataset(self) -> None:
+        self.merge_columns(["sentence_A", "sentence_B"], "text")
+        self.rename_column("sentence_A", "sentence1")
+        self.rename_column("sentence_B", "sentence2")
+
+        def map_label(row):
+            row["labels"] = 1 if row["entailment_judgment"] == "ENTAILMENT" else 0
+            return row
+
+        self.map(map_label)
+
+    def save(self):
+        self.remove_columns(["pair_ID", "entailment_judgment", "text"])
+        for split in self.dataset.keys():
+            self.dataset[split] = Dataset.from_dict(
+                {column: [self.dataset[split][column]] for column in ["sentence1", "sentence2", "labels"]}
+            )
         super().save()
 
 
@@ -99,15 +145,17 @@ if __name__ == '__main__':
 
     for task in [
         # --------- Classification ---------
-        AllegroReviews,
-        CBD,
-        PAC,
-        PolEmo2In,
-        PolEmo2Out,
+        # AllegroReviews,
+        # CBD,
+        # PAC,
+        # PolEmo2In,
+        # PolEmo2Out,
         # --------- STS ---------
-        # SickrPL,
+        SickrPL,
+        Cdsc_r,
         # --------- Pair Classification ---------
-        # SickePL,
+        SickePL,
+        Cdsc_e
         # --------- Clustering ---------
         # EightTags
     ]:
