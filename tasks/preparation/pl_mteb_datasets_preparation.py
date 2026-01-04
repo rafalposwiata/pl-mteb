@@ -129,6 +129,54 @@ class Cdsc_e(BaseDataset):
         super().save()
 
 
+class PPC(BaseDataset):
+
+    def __init__(self):
+        super().__init__("ppc", "sdadas/ppc", TaskType.PAIR_CLASSIFICATION, label_column="labels",
+                         min_words=1)
+
+    def preprocess_dataset(self) -> None:
+        self.merge_columns(["sentence_A", "sentence_B"], "text")
+        self.rename_column("sentence_A", "sentence1")
+        self.rename_column("sentence_B", "sentence2")
+
+        def map_label(row):
+            row["labels"] = 1 if row["label"] <= 2 else 0
+            return row
+
+        self.map(map_label)
+
+    def save(self):
+        self.remove_columns(["label", "text"])
+        for split in self.dataset.keys():
+            self.dataset[split] = Dataset.from_dict(
+                {column: [self.dataset[split][column]] for column in ["sentence1", "sentence2", "labels"]}
+            )
+        super().save()
+
+
+class PSC(BaseDataset):
+
+    def __init__(self):
+        super().__init__("pcs", "allegro/klej-psc", TaskType.PAIR_CLASSIFICATION, label_column="labels",
+                         min_words=1)
+
+    def preprocess_dataset(self) -> None:
+        self.merge_columns(["extract_text", "summary_text"], "text")
+        self.rename_column("extract_text", "sentence1")
+        self.rename_column("summary_text", "sentence2")
+        self.rename_column("label", "labels")
+
+    def save(self):
+        self.remove_columns(["text"])
+        for split in self.dataset.keys():
+            self.dataset[split] = Dataset.from_dict(
+                {column: [self.dataset[split][column]] for column in ["sentence1", "sentence2", "labels"]}
+            )
+        super().save()
+
+
+
 class EightTags(BaseDataset):
 
     def __init__(self):
@@ -155,7 +203,9 @@ if __name__ == '__main__':
         Cdsc_r,
         # --------- Pair Classification ---------
         SickePL,
-        Cdsc_e
+        Cdsc_e,
+        PPC,
+        PSC
         # --------- Clustering ---------
         # EightTags
     ]:
