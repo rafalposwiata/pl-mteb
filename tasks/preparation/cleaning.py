@@ -19,15 +19,17 @@ def normalize_text(text: str) -> str:
 # Implementation based on https://gist.github.com/AlexeyVatolin/ea3adc21aa7a767603ff393b22085adc
 class DatasetCleaner:
 
-    def __init__(self, text_field: str = None, label_column: str = None, min_words: int = 3,
-                 only_exact_comparisons: bool = False):
+    def __init__(self, text_field: str = None, label_column: str = None, min_words: int = 3, validate_labels: bool = True,
+                 score_labels: bool = False, validate_leakage: bool = True, only_exact_comparisons: bool = False):
         self.text_column: str = text_field
         self.label_column: str = label_column
         self.min_words: int = min_words
+        self.validate_labels: bool = validate_labels
+        self.score_labels: bool = score_labels
+        self.validate_leakage: bool = validate_leakage
         self.only_exact_comparisons: bool = only_exact_comparisons
 
-    def clean(self, dataset: DatasetDict, text_column: str = None, validate_labels: bool = True, score_labels: bool = False,
-              validate_leakage: bool = True, skip_splits: List = None) -> tuple[DatasetDict, dict[str, dict]]:
+    def clean(self, dataset: DatasetDict, text_column: str = None, skip_splits: List = None) -> tuple[DatasetDict, dict[str, dict]]:
         if self.text_column is None:
             self.text_column = text_column
         report: dict[str, dict] = dict()
@@ -38,15 +40,15 @@ class DatasetCleaner:
                 for func_name, func in self.get_cleaning_funcs():
                     self.execute_filter(dataset, split, report, func_name, func)
 
-        if validate_labels:
-            dataset = self.filter_unclear_label(dataset, report, score_labels)
+        if self.validate_labels:
+            dataset = self.filter_unclear_label(dataset, report, self.score_labels)
 
         for split in dataset.keys():
             if skip_splits is None or split not in skip_splits:
                 for func_name in ["deduplicate_exact", "deduplicate_normalized"]:
                     self.execute_filter(dataset, split, report, func_name, lambda ds: self.deduplicate(ds, "normalized" in func_name))
 
-        if validate_leakage:
+        if self.validate_leakage:
             for split in dataset.keys():
                 if skip_splits is None or split not in skip_splits:
                     if split == "train":

@@ -1,5 +1,6 @@
 import json
 import os
+from collections import defaultdict
 from typing import List
 import datasets
 import logging
@@ -45,20 +46,21 @@ class AbsDataset(ABC):
 class BaseDataset(AbsDataset):
 
     def __init__(self, name: str, hf_path: str, task_type: TaskType, subset: str = None, text_column: str = "text",
-                 label_column: str = "label", min_words: int = 3):
+                 label_column: str = "label", min_words: int = 3, validate_leakage: bool = True):
         super().__init__(name, task_type)
         self.text_column: str = text_column
         self.label_column: str = label_column
         self.dataset = self.load(hf_path, subset)
         self.preprocess_dataset()
-        self.cleaner = DatasetCleaner(text_column, label_column, min_words)
+        self.cleaner = DatasetCleaner(text_column, label_column, min_words, score_labels=self.task_type == TaskType.STS,
+                                      validate_leakage=validate_leakage)
 
     @staticmethod
     def load(hf_path, subset):
         return datasets.load_dataset(hf_path, subset, verification_mode=None)
 
     def clean(self) -> None:
-        self.dataset, cleaning_result = self.cleaner.clean(self.dataset, score_labels=self.task_type == TaskType.STS)
+        self.dataset, cleaning_result = self.cleaner.clean(self.dataset)
         logging.info(f"Cleaning result: {cleaning_result}")
         self.save_json("cleaning_result.json", cleaning_result)
 
@@ -70,16 +72,36 @@ class BaseDataset(AbsDataset):
 
     def merge_columns(self, columns: List[str], new_column_name: str) -> None:
         def merge_func(row):
-            row[new_column_name] =  " ".join([row[column] for column in columns])
+            row[new_column_name] = " ".join([row[column] for column in columns])
             return row
+
         self.map(merge_func)
 
-    def map(self, map_func):
+    def map(self, map_func) -> None:
         for split in self.dataset.keys():
             self.dataset[split] = self.dataset[split].map(map_func)
 
+    def filter(self, filter_func) -> None:
+        for split in self.dataset.keys():
+            self.dataset[split] = self.dataset[split].filter(filter_func)
+
+    def reduce_samples(self, min_class_samples: int, max_class_samples: int) -> None:
+        for split in self.dataset.keys():
+            samples_by_class = defaultdict(list)
+            for row in self.dataset[split]:
+                samples_by_class[row[self.label_column]].append(row)
+
+            selected_samples = []
+            for samples in samples_by_class.values():
+                if len(samples) >= min_class_samples:
+                    selected_samples.extend(samples[:min(max_class_samples, len(samples))])
+            self.dataset[split] = Dataset.from_list(selected_samples)
+
     def class_encode_column(self, column_name: str) -> None:
         self.dataset = self.dataset.class_encode_column(column_name)
+
+    def shuffle(self, seed: int = 42) -> None:
+        self.dataset = self.dataset.shuffle(seed=seed)
 
 
 class RetrievalDataset(AbsDataset):
@@ -88,8 +110,7 @@ class RetrievalDataset(AbsDataset):
                  split: str = None, qrels_split: str = "test", separated_qrels: bool = False, min_words: int = 3):
         super().__init__(name, TaskType.RETRIEVAL)
         self.dataset = self.load(hf_path, queries_path, corpus_path, qrels_path, split, qrels_split, separated_qrels)
-        self.cleaner = DatasetCleaner(min_words=min_words)
-
+        self.cleaner = DatasetCleaner(min_words=min_words, validate_labels=False, validate_leakage=False)
 
     @staticmethod
     def load(hf_path, queries_path: str, corpus_path: str, qrels_path: str, split: str, qrels_split,
@@ -104,8 +125,7 @@ class RetrievalDataset(AbsDataset):
         return DatasetDict(dataset)
 
     def clean(self) -> None:
-        self.dataset, cleaning_result = self.cleaner.clean(self.dataset, text_column="text", validate_labels=False,
-                                                           validate_leakage=False, skip_splits=["qrels"])
+        self.dataset, cleaning_result = self.cleaner.clean(self.dataset, text_column="text", skip_splits=["qrels"])
         queries_ids = set(self.dataset["queries"]["_id"])
         passages_ids = set(self.dataset["passages"]["_id"])
         self.dataset["qrels"] = self.dataset["qrels"].filter(lambda row: row["query-id"] in queries_ids

@@ -1,4 +1,5 @@
 import logging
+import re
 from datasets import Dataset
 from tasks.preparation.datasets_preparation import BaseDataset, TaskType
 
@@ -146,6 +147,8 @@ class PPC(BaseDataset):
 
         self.map(map_label)
 
+
+
     def save(self):
         self.remove_columns(["label", "text"])
         for split in self.dataset.keys():
@@ -180,11 +183,67 @@ class PSC(BaseDataset):
 class EightTags(BaseDataset):
 
     def __init__(self):
-        super().__init__("8tags", "sdadas/8tags", TaskType.CLUSTERING, text_column="sentences")
+        super().__init__("8tags", "sdadas/8tags", TaskType.CLUSTERING, text_column="sentences",
+                         label_column="labels")
 
     def preprocess_dataset(self) -> None:
         self.rename_column("sentence", "sentences")
         self.rename_column("label", "labels")
+
+
+class WikinewsPL(BaseDataset):
+
+    def __init__(self, task_category: str):
+        self.task_category: str = task_category
+        super().__init__(f"wikinews_pl_{task_category}", "rafalposwiata/wikinews-pl", TaskType.CLUSTERING,
+                         text_column="sentences", label_column="labels", validate_leakage=False)
+
+    def preprocess_dataset(self) -> None:
+        self.filter(self.filter_func)
+        self.map(self.map_func)
+        self.shuffle()
+        self.reduce_samples(400, 500)
+        self.shuffle()
+
+    @staticmethod
+    def filter_func(row) -> bool:
+        if len(row["main_categories"]) > 1:
+            return False
+        for forbidden in ["zmarł", "zmarła", "zmarli"]:
+            if forbidden in row["title"].lower():
+                print(row)
+                return False
+        return True
+
+    def map_func(self, row):
+        def remove_starting_date(text: str) -> str:
+            words = text.split(" ")
+            if re.match('[\d:-]+$', words[0]) and len(words[0]) >= 10:
+                return " ".join(words[1:])
+            else:
+                return text
+        row["sentences"] = row["title"] if self.task_category == "s2s" else f"{row['title']} {row['text']}"
+        row["sentences"] = remove_starting_date(row["sentences"])
+        row["labels"] = row["main_categories"][0]
+        return row
+
+    def save(self):
+        self.remove_columns(["url", "title", "main_categories", "categories", "text"])
+        self.dataset["test"] = self.dataset["train"]
+        del self.dataset["train"]
+        super().save()
+
+
+class WikinewsPLS2S(WikinewsPL):
+
+    def __init__(self):
+        super().__init__("s2s")
+
+
+class WikinewsPLP2P(WikinewsPL):
+
+    def __init__(self):
+        super().__init__("p2p")
 
 
 if __name__ == '__main__':
@@ -199,15 +258,17 @@ if __name__ == '__main__':
         # PolEmo2In,
         # PolEmo2Out,
         # --------- STS ---------
-        SickrPL,
-        Cdsc_r,
+        # SickrPL,
+        # Cdsc_r,
         # --------- Pair Classification ---------
-        SickePL,
-        Cdsc_e,
-        PPC,
-        PSC
+        # SickePL,
+        # Cdsc_e,
+        # PPC,
+        # PSC
         # --------- Clustering ---------
-        # EightTags
+        # EightTags,
+        WikinewsPLS2S,
+        WikinewsPLP2P,
     ]:
         _task = task()
         logging.info(f"Preparing {_task.name}")
