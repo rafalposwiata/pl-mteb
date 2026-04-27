@@ -1,5 +1,39 @@
-# ----------- Multilingual Sentence Transformers -----------
+# ----------- Multilingual -----------
+sentence-transformers/LaBSE
 sentence-transformers/distiluse-base-multilingual-cased-v2
+sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+sentence-transformers/paraphrase-multilingual-mpnet-base-v2
+sentence-transformers/static-similarity-mrl-multilingual-v1
+# e5
+intfloat/multilingual-e5-small
+intfloat/multilingual-e5-base
+intfloat/multilingual-e5-large
+# KaLM
+HIT-TMG/KaLM-embedding-multilingual-mini-instruct-v1
+# snowflake-arctic
+Snowflake/snowflake-arctic-embed-l-v2.0
+Snowflake/snowflake-arctic-embed-m-v2.0
+# drama
+facebook/drama-base
+facebook/drama-large
+facebook/drama-1b
+# Qwen
+Qwen/Qwen3-Embedding-0.6B
+Qwen/Qwen3-Embedding-4B
+Qwen/Qwen3-Embedding-8B
+# bge
+BAAI/bge-multilingual-gemma2
 
-# ----------- Polish Sentence Transformers -----------
+# ----------- Polish -----------
+ipipan/silver-retriever-base-v1.1
+sdadas/st-polish-paraphrase-from-mpnet
+sdadas/st-polish-paraphrase-from-distilroberta
+sdadas/mmlw-e5-small
+sdadas/mmlw-e5-base
+sdadas/mmlw-e5-large
+sdadas/mmlw-roberta-base
 sdadas/mmlw-roberta-large
+sdadas/mmlw-retrieval-roberta-large
+sdadas/mmlw-retrieval-roberta-large-v2
+sdadas/stella-pl
+sdadas/stella-pl-retrieval-8k

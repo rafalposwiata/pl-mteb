@@ -246,29 +246,77 @@ class WikinewsPLP2P(WikinewsPL):
         super().__init__("p2p")
 
 
+
+class Plsc(BaseDataset):
+
+    def __init__(self, task_category: str):
+        self.task_category: str = task_category
+        super().__init__(f"plsc_{task_category}", "rafalposwiata/plsc", TaskType.CLUSTERING,
+                         text_column="sentences", label_column="labels_merged", validate_leakage=False)
+
+    def preprocess_dataset(self) -> None:
+        self.filter(self.filter_func)
+        self.map(self.map_func)
+        self.shuffle()
+        self.reduce_samples(50, 200)
+
+    @staticmethod
+    def filter_func(row) -> bool:
+        if len(row["scientific_fields"]) > 1 or len(row["disciplines"]) > 1:
+            return False
+        return True
+
+    def map_func(self, row):
+        row["sentences"] = row["title"] if self.task_category == "s2s" else f"{row['title']} {row['abstract']}"
+        _labels = [row["scientific_fields"][0], row["disciplines"][0]]
+        row["labels"] = _labels
+        row["labels_merged"] = '__'.join(_labels)
+        return row
+
+    def save(self):
+        self.remove_columns(["title", "abstract", "journal", "scientific_fields", "disciplines", "labels_merged"])
+        self.dataset["test"] = self.dataset["train"]
+        del self.dataset["train"]
+        super().save()
+
+
+class PlscS2S(Plsc):
+
+    def __init__(self):
+        super().__init__("s2s")
+
+
+class PlscP2P(Plsc):
+
+    def __init__(self):
+        super().__init__("p2p")
+
+
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(message)s', level=logging.INFO)
     logging.root.setLevel(logging.INFO)
 
     for task in [
         # --------- Classification ---------
-        # AllegroReviews,
-        # CBD,
-        # PAC,
-        # PolEmo2In,
-        # PolEmo2Out,
+        AllegroReviews,
+        CBD,
+        PAC,
+        PolEmo2In,
+        PolEmo2Out,
         # --------- STS ---------
-        # SickrPL,
-        # Cdsc_r,
+        SickrPL,
+        Cdsc_r,
         # --------- Pair Classification ---------
-        # SickePL,
-        # Cdsc_e,
-        # PPC,
-        # PSC
+        SickePL,
+        Cdsc_e,
+        PPC,
+        PSC,
         # --------- Clustering ---------
-        # EightTags,
+        EightTags,
         WikinewsPLS2S,
         WikinewsPLP2P,
+        PlscS2S,
+        PlscP2P,
     ]:
         _task = task()
         logging.info(f"Preparing {_task.name}")
